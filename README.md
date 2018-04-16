@@ -53,3 +53,11 @@ Copyright (c) 2015-2018 Anish Athalye. Released under GPLv3. See
 
 ## Citations
 Mark TL, Vandivort-Warren R, Miller K: Mental health spending by private insurance: implications for the mental health parity and addiction equity act. Psychiatr Serv 63:313–318, 2012.  
+Stephens JR, Steiner MJ, DeJong N, Rodean J, Hall M,
+Richardson T, et al: Healthcare utilization and spending for
+constipation in children with versus without complex chronic
+conditions. J Pediatr Gastroenterol Nutr 64:31–36, 2017.  
+Wu J, Thammakhoune J, Dai W, Koren A, Tcherny-Lessenot
+S, Wu C, et al: Assessment of dronedarone utilization using
+US claims databases. Clin Ther 36:264–272, 272.e1–272.e2,
+2014
