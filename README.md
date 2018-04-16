@@ -2,7 +2,9 @@
 
 Placeholder for a project description
 
-## Related Projects
+## Helpful Links for getting started
+[net]: http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat
+
 
 ## Running
 
@@ -20,19 +22,7 @@ To evaluate the test dataset:
 
 ## Citation
 
-If you use this implementation in your work, please cite the following:
-
-```
-@misc{athalye2015neuralstyle,
-  author = {Anish Athalye},
-  title = {Neural Style},
-  year = {2015},
-  howpublished = {\url{https://github.com/anishathalye/neural-style}},
-  note = {commit xxxxxxx}
-}
-```
-
-## License
+# License
 
 Copyright (c) 2015-2018 Anish Athalye. Released under GPLv3. See
 [LICENSE.txt][license] for details.
