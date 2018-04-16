@@ -3,6 +3,9 @@
 Placeholder for a project description
 
 ## Helpful Links for getting started
+
+[Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+
 [Example from TA's on Friday - Neural Style](https://github.com/anishathalye/neural-style)
 
 [Tensorflow Installation](https://www.tensorflow.org/install/)
@@ -19,13 +22,18 @@ To evaluate the test dataset:
 `python evaluate_dataset --dataset test_dataset --output predictions`
 
 
+## Inline Image example: 
+![alt text](images/Original.jpg|width=200)
+
+![alt text](images/Style.jpg) 
+
+![alt text](images/Style Transfer.jpg "Example image transfer")
 
 
 
 ## Citation
 
 # License
-
 Copyright (c) 2015-2018 Anish Athalye. Released under GPLv3. See
 [LICENSE.txt][license] for details.
 
