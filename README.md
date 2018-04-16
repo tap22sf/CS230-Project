@@ -6,13 +6,16 @@ Placeholder for a project description
 
 ## Running
 
-`python got nothing to run yet!`
+To train the newtwork:
 
-Run `python neural_style.py --help` to see a list of all options.
+`python train_network --dataset train_dataset`
 
-Use `--checkpoint-output` and `--checkpoint-iterations` to save checkpoint images.
+To evaluate the test dataset: 
 
-Use `--iterations` to change the number of iterations (default 1000).  For a 512×512 pixel content file, 1000 iterations take 60 seconds on a GTX 1080 Ti, 90 seconds on a Maxwell Titan X, or 60 minutes on an Intel Core i7-5930K. Using a GPU is highly recommended due to the huge speedup.
+`python evaluate_dataset --dataset test_dataset --output predictions`
+
+
+
 
 
 ## Citation
