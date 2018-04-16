@@ -4,6 +4,7 @@ Placeholder for a project description
 
 ## Helpful Links for getting started
 [Example from TA's on Friday - Neural Style](https://github.com/anishathalye/neural-style)
+
 [Tensorflow Installation](https://www.tensorflow.org/install/)
 
 
