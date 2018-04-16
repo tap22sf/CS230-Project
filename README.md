@@ -3,7 +3,7 @@
 Placeholder for a project description
 
 ## Helpful Links for getting started
-[net]: http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat
+[Tensorflow Installation](https://www.tensorflow.org/install/)
 
 
 ## Running
