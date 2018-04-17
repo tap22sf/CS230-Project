@@ -5,7 +5,7 @@ Placeholder for a project description
 # Data source
 This project utilizes data from inpatient, outpatient, and pharmacy settings from the MarketScan Commercial Claims and Encounters Database and Medicare Supplemental and Coordination of Benefits Database. These data encompass health care claims submitted on behalf of individuals enrolled in private insurance plans and Medicare through a participating employer, health plan, or government
 organization. Both inpatient and outpatient data (including information on diagnosis, date of service, demographics, and employer
-information, among others) were queried to select our cohort of patients undergoing lumbar fusion. To obtain information on prescription drug use, we used the associated drug prescription database, which includes information on all prescriptions covered by insurance that were filled by the patient, along with dosage, drug identification number, day supply, and prescription date. The data are a common source of data for analyses of health care utilization and spending (1, 2, 3, 4).  
+information, among others) were queried to select our cohort of patients undergoing lumbar fusion. To obtain information on prescription drug use, we used the associated drug prescription database, which includes information on all prescriptions covered by insurance that were filled by the patient, along with dosage, drug identification number, day supply, and prescription date. The data are a common source of data for analyses of health care utilization and spending (1, 2, 3).  
 
 ## Related Projects
 
@@ -52,12 +52,12 @@ Copyright (c) 2015-2018 Anish Athalye. Released under GPLv3. See
 [license]: LICENSE.txt
 
 ## Citations
-Mark TL, Vandivort-Warren R, Miller K: Mental health spending by private insurance: implications for the mental health parity and addiction equity act. Psychiatr Serv 63:313–318, 2012.  
-Stephens JR, Steiner MJ, DeJong N, Rodean J, Hall M,
+1) Mark TL, Vandivort-Warren R, Miller K: Mental health spending by private insurance: implications for the mental health parity and addiction equity act. Psychiatr Serv 63:313–318, 2012.  
+2) Stephens JR, Steiner MJ, DeJong N, Rodean J, Hall M,
 Richardson T, et al: Healthcare utilization and spending for
 constipation in children with versus without complex chronic
 conditions. J Pediatr Gastroenterol Nutr 64:31–36, 2017.  
-Wu J, Thammakhoune J, Dai W, Koren A, Tcherny-Lessenot
+3) Wu J, Thammakhoune J, Dai W, Koren A, Tcherny-Lessenot
 S, Wu C, et al: Assessment of dronedarone utilization using
 US claims databases. Clin Ther 36:264–272, 272.e1–272.e2,
 2014
