@@ -22,24 +22,34 @@ K.set_image_data_format('channels_last')
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import imshow
 
-X = load_dataset()
+# Read the datasets
+X,Y = loadData()
 
+# Normalize input and output fields
+print ("number of training examples = " + str(X.shape[0]))
 print ("X shape: " + str(X.shape))
 print (X)
+print ("Y shape: " + str(Y.shape))
+print (Y)
 
-#X_train_orig, Y_train_orig, X_test_orig, Y_test_orig, classes = load_dataset()
+# Normalize input and output datasets
 
-# Normalize image vectors
-##X_train = X_train_orig/255.
-#X_test = X_test_orig/255.
+# Divide into train/dev/test sets
 
-# Reshape
-#Y_train = Y_train_orig.T
-#Y_test = Y_test_orig.T
+# Build a model
+#oModel = OpiodModel(X_train[0].shape)
 
-#print ("number of training examples = " + str(X_train.shape[0]))
-#print ("number of test examples = " + str(X_test.shape[0]))
-#print ("X_train shape: " + str(X_train.shape))
-#print ("Y_train shape: " + str(Y_train.shape))
-#print ("X_test shape: " + str(X_test.shape))
-#print ("Y_test shape: " + str(Y_test.shape))
+# Apply input
+#oModel.compile(optimizer = "Adam", loss = "binary_crossentropy", metrics = ["binary_accuracy"])
+
+# Train the model, iterating on the data in batches of 32 samples
+#oModel.fit(X_train, Y_train, epochs=40, batch_size=16)
+
+# Evaluate the results
+#preds = oModel.evaluate(X_test, Y_test)
+
+print()
+print ("Loss = " + str(preds[0]))
+print ("Test Accuracy = " + str(preds[1]))
+
+oModel.summary()

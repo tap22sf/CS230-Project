@@ -5,8 +5,6 @@
 import keras.backend as K
 import math
 import numpy as np
-import h5py
-import matplotlib.pyplot as plt
 import os.path
 
 
@@ -16,48 +14,47 @@ def mean_pred(y_true, y_pred):
 # Reads an input dataset and converts to np binary for faster futuer loads
 #
 
-def load_dataset (
-    xfilename = r'..\..\Example Medical Database\df_x_withGeo',
-    yfilename = r'..\..\Example Medical Database\data_y'):
+def loadData (
+    xFilename = r'..\..\Example Medical Database\df_x_withGeo',
+    yFilename = r'..\..\Example Medical Database\data_y'):
+    """
+    Load data from CSV files.
+    
+    Arguments:
+    xFilename -- path to a X datafile
+    yFilename -- path to a Y datafile
+    
+    Returns:
+    xdata -- np.array(m, #inputs)
+    ydata -- np.array(m, #outputs)
+    """
 
-    # Check for the real Medical Records Database in binary form
-    xCsvFilename = xfilename + ".csv"
-    XNpFilename = xfilename + ".npy"
+    return (loadDataSet (xFilename), loadDataSet (yFilename))
 
-    # Look for the binary version first
-    if not os.path.isfile(XNpFilename):
+# Check for the real Medical Records Database in binary form
+def loadDataSet (filename):
+    CSVFilename = filename + ".csv"
+    NPFilename = filename + ".npy"
+    
+    if not os.path.isfile(NPFilename):
         
         # Load the csv file
-        print ("Loading input file : " + xCsvFilename)
+        print ("Loading input file : " + CSVFilename)
         try :
-            data_x = np.genfromtxt(xCsvFilename, skip_header=0, names=True, delimiter=',', max_rows=10000)
-            np.save(XNpFilename, data_x);
-            print ("Saved binary version of input file : " + xCsvFilename)
+            data = np.genfromtxt(CSVFilename, skip_header=0, names=True, delimiter=',', missing_values=0.0, dtype='f8', max_rows=10000)
+            #np.save(NPFilename, data);
+            print ("Saved binary version of input file : " + NPFilename)
         except:
-            print ("Unable to read : " + xCsvFilename)
-
+            exit ("Unable to read : " + CSVFilename)
+           
 
     else:
-        print ("Loading binary input file : " + XNpFilename)
+        print ("Loading binary input file : " + NPFilename)
         try:
-            data_x = np.load(XNpFilename)
+            data = np.load(NPFilename)
         except:
-            print ("Unable to open : " + xCsvFilename)
+            exit ("Unable to open : " + NPFilename)
 
-    return (data_x)
-
-    #train_dataset = h5py.File('datasets/train_happy.h5', "r")
-    #train_set_x_orig = np.array(train_dataset["train_set_x"][:]) # your train set features
-    #train_set_y_orig = np.array(train_dataset["train_set_y"][:]) # your train set labels
-
-    #test_dataset = h5py.File('datasets/test_happy.h5', "r")
-    #test_set_x_orig = np.array(test_dataset["test_set_x"][:]) # your test set features
-    #test_set_y_orig = np.array(test_dataset["test_set_y"][:]) # your test set labels
-
-    #classes = np.array(test_dataset["list_classes"][:]) # the list of classes
-    
-    #train_set_y_orig = train_set_y_orig.reshape((1, train_set_y_orig.shape[0]))
-    #test_set_y_orig = test_set_y_orig.reshape((1, test_set_y_orig.shape[0]))
-    
-    #return train_set_x_orig, train_set_y_orig, test_set_x_orig, test_set_y_orig, classes
+#    return data.transpose()
+    return data
 
