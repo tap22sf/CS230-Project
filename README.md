@@ -31,6 +31,8 @@ To evaluate the test dataset:
 
 ![alt text](images/Style Transfer.jpg "Example image transfer")
 
+![plot] (/images/plotCompare.png)
+
 
 
 ## Citations
