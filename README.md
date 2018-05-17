@@ -9,6 +9,8 @@ Placeholder for a project description
 [Example from TA's on Friday - Neural Style](https://github.com/anishathalye/neural-style)
 
 [Tensorflow Installation](https://www.tensorflow.org/install/)
+## Database
+This project utilizes data from inpatient, outpatient, and pharmacy settings from the MarketScan Commercial Claims and Encounters Database and Medicare Supplemental and Coordination of Benefits Database. These data encompass health care claims submitted on behalf of individuals enrolled in private insurance plans and Medicare through a participating employer, health plan, or government organization. Both inpatient and outpatient data (including information on diagnosis, date of service, demographics, and employer information, among others) were queried to select our cohort of patients undergoing lumbar fusion. To obtain information on prescription drug use, we used the associated drug prescription database, which includes information on all prescriptions covered by insurance that were filled by the patient, along with dosage, drug identification number, day supply, and prescription date. The data are a common source of data for analyses of health care utilization and spending (1, 2, 3, 4).  
 
 
 ## Running
@@ -31,7 +33,8 @@ To evaluate the test dataset:
 
 
 
-## Citation
+## Citations
+Mark TL, Vandivort-Warren R, Miller K: Mental health spending by private insurance: implications for the mental health parity and addiction equity act. Psychiatr Serv 63:313–318, 2012.
 
 # License
 Copyright (c) 2015-2018 Anish Athalye. Released under GPLv3. See
