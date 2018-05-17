@@ -16,10 +16,17 @@ import keras.backend as K
 from dataParser import *
 from oModel import *
 
+import os
 
+# Read from folder "Medical Database" which is at the same level as the project folder
+absFilePath = os.path.abspath(__file__)
+fileDir = os.path.dirname(absFilePath)
+parentDir = os.path.dirname(os.path.dirname(os.path.dirname(fileDir)))
+dataFile1Path = os.path.join(parentDir, 'Medical Database/df_x_withGeo')
+dataFile2Path = os.path.join(parentDir, 'Medical Database/data_y')
 
 # Read the datasets
-X,Y = loadData(r'E:\Medical Database\df_x_withGeo', r'E:\Medical Database\data_y')
+X,Y = loadData(dataFile1Path, dataFile2Path)
 
 # Normalize input and output fields
 print ("number of training examples = " + str(X.shape[0]))
