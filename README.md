@@ -36,6 +36,8 @@ To evaluate the test dataset:
 
 ![alt text](images/Style Transfer.jpg "Example image transfer")
 
+![plot] (https://github.com/tap22sf/CS230-Project/images/plotCompare.png)
+
 
 
 ## Citations
