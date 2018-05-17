@@ -21,7 +21,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="kt_utils.py" />
+    <Compile Include="dataFields.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="dataParser.py" />
     <Compile Include="oModel.py">
       <SubType>Code</SubType>
     </Compile>
