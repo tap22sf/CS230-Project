@@ -4,32 +4,14 @@
 
 import math
 import numpy as np
-
 from sklearn import preprocessing
-
 import pandas as pd
 
 from dataFields import *
 
-
-
-def mean_pred(y_true, y_pred):
-    return K.mean(y_pred)
 #
 # Reads an input dataset and converts to np binary for faster futuer loads
 #
-
-def weekdayToInt(weekday):
-    return {
-        'Monday': 0,
-        'Tuesday': 1,
-        'Wednesday': 2,
-        'Thursday': 3,
-        'Friday': 4,
-        'Saturday': 5,
-        'Sunday': 6
-    } [weekday]
-
 
 def loadData (
     xFilename = r'..\..\Example Medical Database\df_x_withGeo',
@@ -46,10 +28,10 @@ def loadData (
     ydata -- np.array(m, #outputs)
     """
 
-    return (loadDataSet (xFilename, xusecols, norm=True), loadDataSet (yFilename, yusecols, yconverters))
+    return (loadDataSet (xFilename, xusecols, norm=False, fake_data=0), loadDataSet (yFilename, yusecols, fake_data=0))
 
 # Check for the real Medical Records Database in binary form
-def loadDataSet (filename, usecols, norm=False):
+def loadDataSet (filename, usecols, norm=False, fake_data=0):
     CSVFilename = filename + ".csv"
     NPFilename = filename + ".npy"
     
@@ -62,15 +44,30 @@ def loadDataSet (filename, usecols, norm=False):
 
         data = dfz.values
         
+        if fake_data == 1:
+            mu, sigma = 0, 2 # mean and standard deviation
+            s1 = np.random.normal(mu, sigma, size=dfz.values.shape)
+            
+            mu, sigma = 3, 2 # mean and standard deviation
+            s2= np.random.normal(mu, sigma, size=dfz.values.shape)
+            data = np.concatenate((s1, s2), axis=0)
+
+        elif fake_data == 2:
+            mu, sigma = 1, 0.1 # mean and standard deviation
+            s1= np.random.normal(mu, sigma, size=dfz.values.shape)
+                        
+            mu, sigma = 1, 0.1 # mean and standard deviation
+            s2= np.random.normal(mu, sigma, size=dfz.values.shape)
+            data = np.concatenate((s1, s2), axis=0)
+
+ 
         if norm:
             min_max_scaler = preprocessing.MinMaxScaler()
             x_scaled = min_max_scaler.fit_transform(data)
-
             df_norm = pd.DataFrame(x_scaled)
-            print (df_norm)
-            return df_norm.values
-        else:
-            print (dfz)
-            return dfz.values
+            data =  df_norm.values
+
+
+        return data
 
 
