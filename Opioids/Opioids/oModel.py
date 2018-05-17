@@ -3,9 +3,9 @@ from keras.layers import Input, Dense, Activation, ZeroPadding2D, BatchNormaliza
 from keras.layers import AveragePooling2D, MaxPooling2D, Dropout, GlobalMaxPooling2D, GlobalAveragePooling2D
 from keras.models import Model
 
-def OpiodModel(input_shape):
+def OpioidModel(input_shape):
     """
-    Implementation of the OpiodModel.
+    Implementation of the OpioidModel.
     
     Arguments:
     input_shape -- shape of the images of the dataset
@@ -25,6 +25,6 @@ def OpiodModel(input_shape):
     predictions = Dense(1, activation='sigmoid')(X)
 
     # Create model. This creates your Keras model instance, you'll use this instance to train/test the model.
-    model = Model(inputs = X_input, outputs = predictions, name='OpiodModel')
+    model = Model(inputs = X_input, outputs = predictions, name='OpioidModel')
     
     return model

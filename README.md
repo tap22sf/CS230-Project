@@ -15,6 +15,11 @@ This project utilizes data from inpatient, outpatient, and pharmacy settings fro
 
 ## Running
 
+To create virtual environment:
+`virtualenv -p python3 .env`
+`source .env/bin/activate`
+`pip install -r CS230-Project/requirements.txt`
+
 To train the newtwork:
 
 `python train_network --dataset train_dataset`
@@ -30,6 +35,8 @@ To evaluate the test dataset:
 ![alt text](images/Style.jpg) 
 
 ![alt text](images/Style Transfer.jpg "Example image transfer")
+
+![plot] (https://github.com/tap22sf/CS230-Project/images/plotCompare.png)
 
 
 
