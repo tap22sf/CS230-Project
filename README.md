@@ -36,7 +36,7 @@ To evaluate the test dataset:
 
 ![alt text](images/Style Transfer.jpg "Example image transfer")
 
-![alt text] (images/plotCompare.png)
+![alt text](CS230-Project/images/plotCompare.png)
 
 
 
