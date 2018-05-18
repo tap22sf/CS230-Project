@@ -71,3 +71,27 @@ def loadDataSet (filename, usecols, norm=False, fake_data=0):
         return data
 
 
+def split_dataset(X, Y, training_portion = 0.9, seed = 0):
+    """
+    Arguments:
+    X -- input data, of shape (input size, number of examples)
+    """
+    
+    np.random.seed(seed)            # To make your "random" minibatches the same as ours
+    m = X.shape[0]                  # number of examples
+        
+    # Step 1: Shuffle (X, Y)
+    permutation = list(np.random.permutation(m))
+    shuffled_X = X[permutation, :]
+    shuffled_Y = Y[permutation, :]
+
+    # Step 2: Partition (shuffled_X, shuffled_Y).
+    num_training = math.floor(training_portion * m) # number of elements for training
+
+    X_training = shuffled_X[0 : num_training, :]
+    Y_training = shuffled_Y[0 : num_training, :]
+
+    X_validation = shuffled_X[num_training : m, :]
+    Y_validation = shuffled_Y[num_training : m, :]
+    
+    return X_training, Y_training, X_validation, Y_validation
