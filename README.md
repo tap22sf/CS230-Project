@@ -52,9 +52,9 @@ Copyright (c) 2015-2018 Anish Athalye. Released under GPLv3. See
 
 ## Resources
 [net]: http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat
-[paper]: http://arxiv.org/pdf/1508.06576v2.pdf
+[paper]: http://arxiv.org/pdf/1508.06576v2.pdf  
 [encodings of medical information]: http://people.csail.mit.edu/dsontag/papers/ChoiChiuSontag_AMIA_CRI16.pdf  
-Will be used for ICD-9 code processing
+Will be used for ICD-9 code processing  
 [link to download encodings of ICD-9 codes]: https://github.com/clinicalml/embeddings/blob/master/claims_codes_hs_300.txt.gz  
 [l-bfgs]: https://en.wikipedia.org/wiki/Limited-memory_BFGS
 [adam]: http://arxiv.org/abs/1412.6980
