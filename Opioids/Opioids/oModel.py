@@ -17,9 +17,9 @@ def OpioidModel(input_shape):
     # Define the input placeholder as a tensor with shape input_shape
     X_input = Input(input_shape)
 
-    X = Dense(1000, activation='sigmoid', name='fc1')(X_input)
+    X = Dense(1000, activation='relu', name='fc1')(X_input)
     # X = Dense(1000, input_shape= input_shape, activation='sigmoid', name='fc1')(X_input)
-    #X = Dense(5000, activation='sigmoid', name='fc4')(X)
+    # X = Dense(1000, activation='relu', name='fc2')(X)
     #X = Dense(1000, activation='sigmoid', name='fc5')(X)
     #X = Dense(1000, activation='sigmoid', name='fc6')(X)
     #X = Dense(10, activation='sigmoid', name='fc7')(X)

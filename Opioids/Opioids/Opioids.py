@@ -32,8 +32,8 @@ training_portion = 0.9
 seed = 0 # Random generator
 
 # Optimization parameters
-epochs=3
-batch_size=100
+epochs=10
+batch_size=1000
 
 # Adam parameters 
 lr = 0.05
