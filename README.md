@@ -36,7 +36,8 @@ To evaluate the test dataset:
 
 ![alt text](images/Style Transfer.jpg "Example image transfer")
 
-![plot] (https://github.com/tap22sf/CS230-Project/images/plotCompare.png)
+Preliminary graph of logistic rression and RF results:  
+![alt text](https://github.com/tap22sf/CS230-Project/blob/master/images/plotCompare.png)  
 
 
 
@@ -50,11 +51,12 @@ To evaluate the test dataset:
 Copyright (c) 2015-2018 Anish Athalye. Released under GPLv3. See
 [LICENSE.txt][license] for details.
 
-[net]: http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat
-[paper]: http://arxiv.org/pdf/1508.06576v2.pdf
+## Resources
+[net](http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat)  
+[paper](http://arxiv.org/pdf/1508.06576v2.pdf)  
+[encodings of medical information](http://people.csail.mit.edu/dsontag/papers/ChoiChiuSontag_AMIA_CRI16.pdf)  (will be used for ICD-9 code processing)  
+[link to download encodings of ICD-9 codes](https://github.com/clinicalml/embeddings/blob/master/claims_codes_hs_300.txt.gz)  
 [l-bfgs]: https://en.wikipedia.org/wiki/Limited-memory_BFGS
 [adam]: http://arxiv.org/abs/1412.6980
 [ad]: https://en.wikipedia.org/wiki/Automatic_differentiation
-[lengstrom-fast-style-transfer]: https://github.com/lengstrom/fast-style-transfer
-[fast-neural-style]: https://arxiv.org/pdf/1603.08155v1.pdf
 [license]: LICENSE.txt
