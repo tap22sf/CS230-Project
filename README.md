@@ -55,7 +55,7 @@ Copyright (c) 2015-2018 Anish Athalye. Released under GPLv3. See
 [paper](http://arxiv.org/pdf/1508.06576v2.pdf)  
 [encodings of medical information](http://people.csail.mit.edu/dsontag/papers/ChoiChiuSontag_AMIA_CRI16.pdf)  (will be used for ICD-9 code processing)  
 [link to download encodings of ICD-9 codes](https://github.com/clinicalml/embeddings/blob/master/claims_codes_hs_300.txt.gz)  
-[link to CDC MME conversion table] (https://www.cdc.gov/drugoverdose/resources/data.html)
-[l-bfgs]: https://en.wikipedia.org/wiki/Limited-memory_BFGS
-[adam]: http://arxiv.org/abs/1412.6980
+[link to CDC MME conversion table](https://www.cdc.gov/drugoverdose/resources/data.html)
+[l-bfgs]: https://en.wikipedia.org/wiki/Limited-memory_BFGS  
+[adam]: http://arxiv.org/abs/1412.6980  
 [license]: LICENSE.txt
