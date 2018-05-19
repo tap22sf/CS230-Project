@@ -37,7 +37,7 @@ To evaluate the test dataset:
 ![alt text](images/Style Transfer.jpg "Example image transfer")
 
 Preliminary graph of logistic regssion and RF results:  
-![alt text](https://github.com/tap22sf/CS230-Project/blob/master/images/plotCompare.png)  
+![alt text](https://github.com/tap22sf/CS230-Project/edit/master/README.mdCS230-Project/Images/AUC comparison.pdf)  
 
 
 
