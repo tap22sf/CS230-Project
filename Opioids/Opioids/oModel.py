@@ -1,7 +1,8 @@
 from keras import layers
-from keras.layers import Input, Dense, Activation, ZeroPadding2D, BatchNormalization, Flatten, Conv2D
+from keras.layers import Input, Embedding, LSTM, Dense, Activation, ZeroPadding2D, BatchNormalization, Flatten, Conv2D
 from keras.layers import AveragePooling2D, MaxPooling2D, Dropout, GlobalMaxPooling2D, GlobalAveragePooling2D
 from keras.models import Model
+
 
 def OpioidModel(input_shape):
     """
@@ -17,13 +18,17 @@ def OpioidModel(input_shape):
     # Define the input placeholder as a tensor with shape input_shape
     X_input = Input(input_shape)
 
-    X = Dense(1000, activation='relu', name='fc1')(X_input)
-    # X = Dense(1000, input_shape= input_shape, activation='sigmoid', name='fc1')(X_input)
-    # X = Dense(1000, activation='relu', name='fc2')(X)
+    X = Dense(1000, input_shape=input_shape, activation='relu', name='fc1')(X_input)
+    X = Dense(1024, activation='relu')(X)
+    X = Dense(1024, activation='relu')(X)
+    X = Dense(512, activation='relu')(X)
+    X = Dense(512, activation='relu')(X)
+    X = Dense(512, activation='relu')(X)
+    X = Dense(512, activation='relu')(X)
     #X = Dense(1000, activation='sigmoid', name='fc5')(X)
-    #X = Dense(1000, activation='sigmoid', name='fc6')(X)
-    #X = Dense(10, activation='sigmoid', name='fc7')(X)
-    predictions = Dense(1, activation='sigmoid')(X)
+    #^X = Dense(1000, activation='sigmoid', name='fc6')(X)
+    predictions = Dense(1, activation='relu')(X)
+    #predictions = Dense(1, input_shape= input_shape, activation='sigmoid')(X_input)
 
     # Create model. This creates your Keras model instance, you'll use this instance to train/test the model.
     model = Model(inputs = X_input, outputs = predictions, name='OpioidModel')

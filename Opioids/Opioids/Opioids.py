@@ -24,6 +24,10 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
+
+def mean_pred(y_true, y_pred):
+    return K.mean(y_pred)
+
 ###################################################################################################
 # Parameters
 
@@ -32,14 +36,23 @@ training_portion = 0.9
 seed = 0 # Random generator
 
 # Optimization parameters
-epochs=10
-batch_size=1000
+epochs=20
+batch_size=100
+
+
+#loss = "binary_crossentropy"
+loss = "mean_squared_error"
 
 # Adam parameters 
-lr = 0.05
-beta_1 = 0.9
-beta_2 = 0.999
-epsilon = 10 ** (-8)
+#lr = 0.002
+#beta_1 = 0.9
+#beta_2 = 0.999
+#epsilon = 10 ** (-8)
+#optimizer = Adam(lr=lr, beta_1=beta_1, beta_2=beta_2, epsilon=epsilon)
+
+lr = 0.002
+optimizer = sgd(lr=lr)
+
 
 ###################################################################################################
 
@@ -54,9 +67,7 @@ dataFile2Path = os.path.join(parentDir, 'Medical Database/data_y')
 X,Y = loadData(dataFile1Path, dataFile2Path)
 print ("X shape: " + str(X.shape))
 print ("Y shape: " + str(Y.shape))
-
-# Normalize input and output fields
-
+print ("Y  mean: " + str(Y.mean()))
 
 # Divide into train/dev/test sets
 X_training, Y_training, X_validation, Y_validation = split_dataset(X, Y, training_portion, seed)
@@ -71,12 +82,10 @@ oModel = OpioidModel(X[0].shape)
 # Apply input
 # Optimizer values
 
-optimizer = Adam(lr=lr, beta_1=beta_1, beta_2=beta_2, epsilon=epsilon, clipnorm=1.)
-
-oModel.compile(optimizer=optimizer, loss = "binary_crossentropy", metrics = ["binary_accuracy"])
+oModel.compile(optimizer=optimizer, loss=loss, metrics=['accuracy', mean_pred])
 
 # Train the model, iterating on the data in batches of 32 samples
-history = oModel.fit(X_training, Y_training, epochs=epochs, batch_size=batch_size)
+history = oModel.fit(X_training, Y_training, epochs=epochs, shuffle=True, batch_size=batch_size)
 
 # Evaluate the results
 preds = oModel.evaluate(X_validation, Y_validation)
@@ -85,7 +94,7 @@ oModel.summary()
 print()
 print ("Loss = " + str(preds[0]))
 print ("Test Accuracy = " + str(preds[1]))
-print()
+#print()
 #for layer in oModel.layers:
 #    weights = layer.get_weights() # list of numpy arrays
 #    print(weights)
@@ -111,6 +120,4 @@ print()
 # plt.xlabel('epoch')
 # # plt.legend(['train', 'test'], loc='upper left')
 # plt.show()
-
-
 
