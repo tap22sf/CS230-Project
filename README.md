@@ -6,7 +6,7 @@ Placeholder for a project description
 
 [Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 
-[Example from TA's on Friday - Neural Style](https://github.com/anishathalye/neural-style)
+[Example from TA's - Neural Style](https://github.com/anishathalye/neural-style)
 
 [Tensorflow Installation](https://www.tensorflow.org/install/)
 ## Database
@@ -36,7 +36,7 @@ To evaluate the test dataset:
 
 ![alt text](images/Style Transfer.jpg "Example image transfer")
 
-Preliminary graph of logistic rression and RF results:  
+Preliminary graph of logistic regssion and RF results:  
 ![alt text](https://github.com/tap22sf/CS230-Project/blob/master/images/plotCompare.png)  
 
 
