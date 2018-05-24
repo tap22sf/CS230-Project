@@ -1,0 +1,400 @@
+---
+title: "Analysis 1_4"
+output: html_document
+---
+# Clean data
+- Exclude patients with <182 preop days and <365 follow-up days  
+- NOT excluding patients with tobacco use (covarying for that)
+- Only including people for whom we have drug data 
+- This time NOT excluding trauma, cancer, failed-back syndrome patients, and paralysis
+```{r, echo=FALSE}
+setwd("~/Documents/Spine surg outcomes/new data")
+library(MASS)
+library(stats)
+library(ggplot2)
+library(dplyr)
+library(plyr)
+library(randomForest)
+library(pROC)
+
+all_fusion0 <- read.csv("all_fusion_new.csv")
+all_fusion <- all_fusion0[-which(duplicated(all_fusion0$ENROLID)),]
+all_fusion$anyDrugs <- all_fusion$RX
+withDrugs <- all_fusion %>% filter(anyDrugs == 1)
+  
+# Exclusion criteria
+preOp <- withDrugs[which(withDrugs$preop_days >= 182),]
+postOp <- preOp[which(preOp$followup >= 365),]
+
+final <- postOp
+
+# Cost stuff - 1-year and 2-year costs
+cost2yr <- read.csv("ALL_PAY_2YR.csv")
+cost1yr <- read.csv("ALL_PAY_1YR.csv")
+colnames(cost2yr)[2] <- "cost_2yr"
+colnames(cost1yr)[2] <- "cost_1yr"
+final1 <- left_join(final, cost2yr, by = "ENROLID")
+final2 <- final1 %>% left_join(cost1yr, by = "ENROLID") 
+final2$inpatcost <- ifelse(final2$TOTPAY > 0, final2$TOTPAY, NA)
+final2$totCost1 <- final2$cost_1yr + final2$inpatcost
+final2$totCost2 <- final2$cost_2yr + final2$inpatcost
+
+## New complication variable - appears that old complication variable was messed up
+final3 <- final2 %>% 
+  group_by(ENROLID) %>%
+  mutate(comp_new = max(MAX_of_INFXN, MAX_of_DEHISC, MAX_of_WOUNDHEMAT, MAX_of_OTHERWNDCOMP, MAX_of_DELIRIUM, chropain_new, pulmcomp_new, pulmemb_new, neurocomp_new, dysrhyth_new)) %>%
+  ungroup()
+
+df <- final3
+
+```
+
+## Create data frame with renamed variables
+```{r, echo = FALSE}
+
+yearVector <- df$YEAR - 2007
+# Health plan: 0 = employer, 1 = health plan
+covariates <- data.frame(subj = df$ENROLID, age = df$AGE, geoRegion = as.factor(df$REGION), state = as.factor(df$STATE), htn = df$HTN_E, chf = df$CHF_C, copd = df$COPD_C, MI = df$MI_C, diab_u = df$DIAB_NC_C, diab_c = df$DIAB_C_C, obesity = df$OBESE_E, drug = df$DRGABS_E, healthPlan = df$HLTHPLAN, alcohol = df$ALCOHL_E, depres6 =  df$MAX_DEPRES_6mo, depres2 = df$MAX_DEPRES_2yr, multi_fusion = df$has_multi_fusion)
+covariates$drg <- df$DRG
+covariates$year = yearVector
+covariates$tbco = df$TBCO
+covariates$instr = df$has_instrum
+covariates$anx2 = df$MAX_ANX_2yr
+covariates$anx6 = df$MAX_ANX_6mo
+covariates$schiz2 <- df$MAX_SCHIZ_2yr
+covariates$schiz6 <- df$MAX_SCHIZ_6mo
+covariates$bpd2 <- df$MAX_BPD_2yr
+covariates$bpd6 <- df$MAX_BPD_6mo
+covariates$ageGrp = as.factor(df$AGEGRP)
+covariates$multi_lami = df$has_multi_lami
+covariates$single_lami = df$has_single_lami
+covariates$planType = as.factor(df$PLANTYP)
+covariates$tbco_tx = df$TBCO_treatment
+covariates$sex <- ifelse(df$SEX == 1, 0, 1)
+covariates$anyDrugs <- ifelse(covariates$subj %in% withDrugs$ENROLID, 1, 0)
+covariates$pvd <- df$PVD_C
+charlson1pt = df$MI_C + df$CHF_C + df$PVD_C + df$CEVD_C + df$DEM_C + df$COPD_C + df$Rheum_C + df$PUD_C + df$MILDLD_C + df$DIAB_NC_C
+restCharlson = 2*(df$PARALY_E + df$RD_C + df$DIAB_C_C) + 3*(df$MSLD_C) + 6*(df$HIV_C)
+covariates$charlson <- charlson1pt + restCharlson
+covariates$indication <- df$PDX
+newLevels <- c("salary non-union", "salary union", "salary other", "hourly non-union", "hourly union", "hourly other", "non-union", "union", "unknown")
+covariates$employment <- as.factor(df$EECLASS)
+levels(covariates$employment) <- newLevels
+covariates$msa <- df$MSA
+covariates$pt_zip <- df$EMPZIP
+ 
+covariates <- cbind(covariates, df[, 40:69]) # adding dx1-15 and procedures
+covariates$PROC1 <- as.factor(covariates$PROC1)
+
+outcomes <- data.frame(subj = df$ENROLID)
+outcomes$comp <- df$comp_new
+outcomes$cost_1yr <- df$cost_1yr
+outcomes$cost_2yr <- df$cost_2yr
+outcomes$readmit = df$MAX_of_readmit30
+outcomes$length_stay = df$DAYS
+outcomes$inpt_cost = df$TOTPAY
+outcomes$cost_90d = df$sum_payments
+outcomes$dis_home = ifelse(df$DSTATUS == 1, 1, 0)
+
+```
+
+## All opiate stuff
+Using drug cohort
+```{r, echo = FALSE}
+conversion <- read.csv("conversion.csv")
+colnames(conversion)[1] <- "NDCNUM"
+
+opiates_2yr <- read.csv("opiates_2yr.csv")
+
+## First do the "off opiates" stuff - identify patients who had no opioid prescriptions months 6-12 after surgery
+anyOpiates <- opiates_2yr %>%
+  filter(prescrip_days_postop <= 365 & prescrip_days_postop > 182) %>%
+  dplyr::select(c(ENROLID, DAYSUPP, prescrip_days_postop, METQTY, NDCNUM)) %>%
+  filter(DAYSUPP > 0 & DAYSUPP < 365) %>% 
+  dplyr::select(ENROLID) %>% 
+  distinct()
+
+# anyOpiates_3_9 is no opioids months 3-12 following surgery
+anyOpiates_3_9 <- opiates_2yr %>%
+  filter(prescrip_days_postop <= 365 & prescrip_days_postop >= 90) %>%
+  dplyr::select(c(ENROLID, DAYSUPP, prescrip_days_postop, METQTY, NDCNUM)) %>%
+  filter(DAYSUPP > 0 & DAYSUPP < 365) %>% 
+  dplyr::select(ENROLID) %>% 
+  distinct()
+
+opiatesClean <- opiates_2yr %>%
+  filter(prescrip_days_postop <= 365 & prescrip_days_postop >= 90) %>%
+  dplyr::select(c(ENROLID, DAYSUPP, prescrip_days_postop, METQTY, NDCNUM)) %>%
+  filter(DAYSUPP > 0 & DAYSUPP < 365)
+
+merged_3_12 <- left_join(opiatesClean, conversion, by = "NDCNUM") %>%
+  mutate(strengthConvert = Strength_Per_Unit * MME_Conversion_Factor) %>%
+  dplyr::select(ENROLID, DAYSUPP, prescrip_days_postop, NDCNUM, strengthConvert, METQTY) %>% 
+  mutate(totalPerPrescrip = strengthConvert * METQTY) %>% 
+  mutate(MDD_prescrip = totalPerPrescrip / DAYSUPP) %>%
+  filter(MDD_prescrip < 900) %>% # filtering prescriptions w/ mean daily doses of >900
+  group_by(ENROLID) %>%
+  dplyr::mutate(totalMME_3_12 = sum(totalPerPrescrip, na.rm = TRUE)) %>%
+  dplyr::mutate(totalDays = sum(DAYSUPP)) %>%
+  dplyr::mutate(sumPrescrip = n()) %>%
+  dplyr::mutate(firstPrescrip = min(prescrip_days_postop)) %>% 
+  dplyr::mutate(lastPrescrip = max(prescrip_days_postop)) %>% 
+  dplyr::mutate(timeBetween = lastPrescrip - firstPrescrip) %>% 
+  dplyr::mutate(meanDailyDose = totalMME_3_12 / totalDays) %>%
+  ungroup() %>%
+  dplyr::rename(subj = ENROLID) %>%
+  dplyr::select(subj, totalMME_3_12, totalDays, meanDailyDose) %>%
+  distinct()
+
+preopOpiates <- read.csv("opiates_6mo_preop.csv") %>% 
+  filter(prescrip_days_postop >= -182 & DAYSUPP > 0) %>%
+  left_join(conversion, by = "NDCNUM") %>% 
+  mutate(strengthConvert = Strength_Per_Unit * MME_Conversion_Factor) %>%
+  dplyr::select(ENROLID, DAYSUPP, prescrip_days_postop, NDCNUM, strengthConvert, METQTY) %>% 
+  mutate(totalPerPrescrip = strengthConvert * METQTY) %>% 
+  group_by(ENROLID) %>%
+  dplyr::mutate(preopSupply = sum(totalPerPrescrip, na.rm = TRUE)) %>%
+  dplyr::mutate(preopDays = sum(DAYSUPP)) %>%
+  dplyr::select(ENROLID, preopSupply, preopDays) %>% 
+  ungroup() %>%
+  distinct() %>% 
+  dplyr::rename(subj = ENROLID)
+
+opiates1 <- left_join(covariates, preopOpiates, by = "subj")
+allDrugsPreop <- read.csv("preop_drugs_1yr.csv") 
+preopAntidep <- allDrugsPreop %>% filter(THERCLS == 69)
+preopAntipsych <- allDrugsPreop %>% filter(THERCLS == 70)
+preopBenzos <- allDrugsPreop %>% filter(THERCLS == 74)
+
+opiates2 <- opiates1 %>% 
+  left_join(merged_3_12, by = "subj") %>%
+  dplyr::mutate(preopDays = ifelse(is.na(preopDays), 0, preopDays)) %>% 
+  dplyr::mutate(totalPreopSupply = ifelse(is.na(preopSupply), 0, preopSupply)) %>% 
+  mutate(totalPostopSupply = as.integer(ifelse(is.na(totalMME_3_12), 0, totalMME_3_12))) %>%
+  mutate(totalPostopDays = ifelse(is.na(totalDays), 0, totalDays)) %>% 
+  mutate(noOpiates = ifelse(subj %in% anyOpiates$ENROLID, 0, 1))
+
+opiates2$preopAntipsych <- ifelse(opiates2$subj %in% preopAntipsych$ENROLID, 1, 0)
+opiates2$preopAntidep <- ifelse(opiates2$subj %in% preopAntidep$ENROLID, 1, 0)
+opiates2$preopBenzos <- ifelse(opiates2$subj %in% preopBenzos$ENROLID, 1, 0)
+
+
+qplot(totalPostopDays, data = opiates2, bins = 100)
+qplot(totalPostopSupply, data = opiates2, bins = 100)
+qplot(meanDailyDose, data = opiates2, bins = 100)
+
+preopAntidep <- allDrugsPreop %>% 
+  filter(prescrip_days_postop > -181) %>%
+  filter(THERCLS == 69) %>% 
+  dplyr::select(ENROLID) %>% 
+  distinct()
+
+opiates2$preopAntidep <- ifelse(opiates2$subj %in% preopAntidep$ENROLID, 1, 0)
+
+```
+
+## Generate plots to visualize data distribution across variables
+```{r}
+library(purrr)
+library(tidyr)
+library(ggplot2)
+
+opiates2 %>%
+  keep(is.numeric) %>% 
+  gather() %>% 
+  ggplot(aes(value)) +
+    facet_wrap(~ key, scales = "free") +
+    geom_histogram()
+
+```
+
+## Separate covariates and outcomes
+```{r}
+
+df_x <- opiates2[, !names(opiates2) %in% c("totalMME_3_12", "totalDays", "meanDailyDose", "noOpiates", "totalPostopDays", "preopSupply", "totalPostopSupply")]
+
+df_y_drugs <- opiates2[, names(opiates2) %in% c("subj", "noOpiates", "totalPostopDays", "totalPostopSupply")]
+df_y <- left_join(df_y_drugs, outcomes, by = "subj")
+
+setwd("~/Documents/CS230")
+write.csv(df_x, "data_x.csv")
+write.csv(df_y, "data_y.csv")
+
+```
+
+## Convert geographic variables into longitude/latitude
+```{r}
+msa_zip <- read.csv("zip codes.csv", colClasses = c('character', 'integer', 'character'))
+zip_geo <- read.csv("zip and geo.csv", colClasses = c('character', 'double', 'double'))
+df_x <- read.csv("data_x.csv")
+
+merged <- left_join(zip_geo, msa_zip, by = c("ZIP" = "zip_code"))
+merged$short_zip <- substr(merged$ZIP, 0, 3)
+df_x$str_zip <- as.character(df_x$pt_zip)
+
+df_x$longitude <- NA
+df_x$latitude <- NA
+
+msa_notFound <- c(rep(NA, 1)) # To keep a running list of the MSAs that couldn't be converted
+
+
+for (i in 1:nrow(df_x)){
+  if(is.na(df_x$msa[i])){ # if no MSA, use employee zip code
+    if(!is.na(df_x$pt_zip[i])){ 
+      codes_df <- merged[which(merged$short_zip == df_x$pt_zip[i]),]
+      minLat <- min(codes_df$LAT)
+      maxLat <- max(codes_df$LAT)
+      minLon <- min(codes_df$LNG)
+      maxLon <- max(codes_df$LNG)
+      df_x$latitude[i] <- (minLat + maxLat) / 2
+      df_x$longitude[i] <- (minLon + maxLon) / 2
+    }
+    # otherwise just leave as NA
+  }
+  else if(df_x$msa[i] %in% merged$MSA_number){ # then MSA isn't NA, use these coordinates
+    codes_df <- merged[which(merged$MSA_number == df_x$msa[i]),]
+    minLat <- min(codes_df$LAT)
+    maxLat <- max(codes_df$LAT)
+    minLon <- min(codes_df$LNG)
+    maxLon <- max(codes_df$LNG)
+    df_x$latitude[i] <- (minLat + maxLat) / 2
+    df_x$longitude[i] <- (minLon + maxLon) / 2
+  }
+  if(! (df_x$msa[i] %in% merged$MSA_number)){
+    if(!(df_x$msa[i] %in% msa_notFound)){
+      msa_notFound <- append(msa_notFound, df_x$msa[i])
+    }
+
+  }
+}
+
+summary(df_x$longitude)
+
+```
+
+## Data cleaning: imputation
+Currently imputing missing values with mean (numerical) and most common category (categorical), but luckily there isn't too much missingness in our dataset
+```{r}
+# impute missing longitude/latitude
+df_x$longitude[which(is.na(df_x$longitude))] <- mean(df_x$longitude, na.rm = TRUE)
+df_x$latitude[which(is.na(df_x$latitude))] <- mean(df_x$latitude, na.rm = TRUE)
+
+write.csv(df_x, "df_x_withGeo.csv")
+ 
+# get percent missingness
+pMiss <- function(x){sum(is.na(x))/length(x)*100}
+apply(df_x,2,pMiss)
+
+dfx <- df_x[, !names(df_x) %in% c("str_zip", "pt_zip", "msa", "X.1", "X")] 
+dfx$planType <- as.factor(dfx$planType)
+
+dfx$planType[which(is.na(dfx$planType))] <-  "6"
+apply(dfx,2,pMiss)
+
+summary(dfx)
+#dfx$totalPreopSupplyNew <- ifelse(dfx$totalPreopSupply > 100000, dfx$totalPreopSupply / 1000, dfx$totalPreopSupply)
+
+# impute missing procedure codes with most common category
+dfx$PROC1[which(is.na(dfx$PROC1))] <- "8108"
+apply(dfx,2,pMiss)
+
+
+
+```
+
+## Normalization
+Now that there's no missingness, normalize numerical variables to have mean zero and variance 1; then convert factors into one-hot variables
+
+```{r}
+# Create factors as one-hot encodings
+namesFact <- c("state", "htn", "chf", "copd", "MI", "diab_u", "diab_c", "obesity", "drug", "healthPlan", "alcohol", "depres6", "depres2", "multi_fusion", "tbco", "instr", "anx2", "anx6", "schiz2", "schiz6", "bpd2", "bpd6", "multi_lami", "single_lami", "tbco_tx", "sex", "pvd", "preopAntipsych", "preopAntidep", "preopBenzos", "geoRegion")
+factDf <- dfx[, names(dfx) %in% namesFact] 
+factDf <- lapply(factDf, factor)
+matrix <- model.matrix(~ . + 0, data=factDf, contrasts.arg = lapply(factDf, contrasts, contrasts=FALSE))
+
+# Scale numeric variables
+colNum <- c("age", "year", "charlson", "preopDays", "totalPreopSupply", "longitude", "latitude")
+numerical$perDay <- numerical$totalPreopSupply / numerical$preopDays
+numerical <- dfx[, names(dfx) %in% colNum] 
+# Now log-transformed total preop supply because of the extreme right skew of the data
+numerical$totalPreopSupply <- log1p(numerical[,"totalPreopSupply"])
+normalized <- scale(numerical, center = TRUE, scale = TRUE)
+normalized <- normalized[,-8]
+summary(normalized[,"totalPreopSupply"])
+
+# now combine scaled numeric variables and categorical variables
+combined <- cbind(data.frame(matrix), normalized)
+vars <- apply(combined, 2, sd)
+
+write.csv(combined, "scaled.csv")
+
+```
+
+## Dealing with ICD-9 Codes - to do!
+```{r}
+
+```
+
+
+## Logistic regression
+
+```{r }
+library(pROC)
+x <- read.csv("scaled.csv")
+outcomes <- read.csv("data_y.csv")
+offOpiates <- data.frame(offOpiates = outcomes$noOpiates)
+
+dataLogistic <- cbind(x, offOpiates)
+
+ind <- sample.int(140848, 130000, replace = FALSE)
+training <- dataLogistic[ind,]
+testing <- dataLogistic[-c(ind),]
+lm <- glm(offOpiates ~ ., data = training, family=binomial)
+
+testing$model_prob <- predict(lm, newdata = testing, type = "response")
+testing$prediction <- ifelse(testing$model_prob > 0.5, 1, 0)
+
+roc1 <- roc(testing$offOpiates, testing$model_prob)
+roc1
+plot(roc1, col = "blue")
+
+trainingPred <- predict(lm, newdata = training, type = "response")
+trainingClass <- ifelse(trainingPred > 0.5, 1, 0)
+trainingAcc <- length(which(trainingClass == training$offOpiates))/ length(trainingClass)
+testingAcc <- length(which(testing$prediction == testing$offOpiates))/ length(testing$prediction)
+```
+
+## Random forest
+For comparison to neural network - will tune to optimal # of trees, etc. later
+```{r}
+
+training$offOpiates <- as.factor(training$offOpiates)
+
+rf = randomForest(offOpiates ~ ., data=training, mtry=10, ntree = 200, importance =TRUE)
+
+prediction = predict(rf, newdata=testing, type = "response")
+
+trainingClass <- predict(rf, newdata = training, type = "response")
+trainingAcc <- length(which(trainingClass == training$offOpiates))/ length(trainingClass)
+testingAcc <- length(which(prediction == testing$offOpiates))/ length(prediction)
+
+yhat.rf = predict(rf, newdata=testing, type = "prob")
+roc2 <- roc(as.numeric(testing$offOpiates), yhat.rf[,2])
+plot(roc1, col = 10, lty = 2, main = "ROC")
+plot(roc2, col = 4, lty = 3, add = TRUE)
+```
+
+## Calculate and plot AUC of our model
+```{r}
+setwd("~/Documents/CS230")
+yhat <- read.csv("pred_y.csv", header = FALSE)
+testY <- read.csv("test_y.csv", header = FALSE)
+roc3 <- roc(as.numeric(testY$V1), yhat$V1)
+
+preds <- ifelse(yhat$V1 >= 0.5, 1, 0)
+
+plot(roc1, col = 10, lty = 2, size = 4, main = "ROC")
+plot(roc2, col = 4, lty = 3, size = 5, add = TRUE)
+plot(roc3, col = 11, lty = 4, size = 4, add = TRUE)
+```
+
