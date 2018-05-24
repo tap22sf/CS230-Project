@@ -8,10 +8,12 @@ import tensorflow as tf
 from keras.utils import layer_utils
 from keras.utils.data_utils import get_file
 from keras.applications.imagenet_utils import preprocess_input
+from keras.callbacks import ModelCheckpoint
 
 from keras.utils.vis_utils import model_to_dot
 from keras.utils import plot_model
 from keras.optimizers import *
+from keras.models import load_model
 
 import keras.backend as K
 
@@ -24,7 +26,6 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
-
 def mean_pred(y_true, y_pred):
     return K.mean(y_pred)
 
@@ -32,6 +33,8 @@ def mean_pred(y_true, y_pred):
 # Parameters
 
 # General
+train = True
+weightfile = r'omodel_weights.h5'
 training_portion = 0.9
 seed = 0 # Random generator
 
@@ -39,24 +42,22 @@ seed = 0 # Random generator
 
 #epochs=1
 epochs=100
-batch_size=75
-
-
+batch_size=16
 loss = "binary_crossentropy"
 #loss = "mean_squared_error"
 
 # Adam parameters 
-lr = 0.004
+lr = 0.001
 beta_1 = 0.9
 beta_2 = 0.999
 epsilon = 10 ** (-8)
-optimizer = Adam(lr=lr, beta_1=beta_1, beta_2=beta_2, epsilon=epsilon)
+optimizer = Adam(lr=lr, beta_1=beta_1, beta_2=beta_2, epsilon=epsilon, clipvalue=1)
 
 #lr = 0.002
 #optimizer = sgd(lr=lr)
 
 
-###################################################################################################
+##########################################################################################&#########
 
 # Read from folder "Medical Database" which is at the same level as the project folder
 absFilePath = os.path.abspath(__file__)
@@ -78,21 +79,29 @@ print ("Y_training shape: " + str(Y_training.shape))
 print ("X_validation shape: " + str(X_validation.shape))
 print ("Y_validation shape: " + str(Y_validation.shape))
 
-print("Y Test set")
-print (Y_validation)
-print ("Y Test Mean : " + str(Y_validation.mean()))
 np.savetxt ("Test_y.csv", Y_validation)
 
-# Build a model 
-oModel = OpioidModel(X[0].shape)
-
-# Apply input
-# Optimizer values
-
-oModel.compile(optimizer=optimizer, loss=loss, metrics=['accuracy', mean_pred])
-
 # Train the model, iterating on the data in batches of 32 samples
-history = oModel.fit(X_training, Y_training, epochs=epochs, shuffle=True, batch_size=batch_size)
+if train:
+    # Build a model 
+    oModel = OpioidModel(X[0].shape)
+
+    # Optimizer values
+    oModel.compile(optimizer=optimizer, loss=loss, metrics=['binary_accuracy', mean_pred])
+
+    ## Add a callback for saving weights each epoch
+    # checkpoint
+    filepath="weights-improvement-{epoch:02d}-{binary_accuracy:.2f}.hdf5"
+    checkpoint = ModelCheckpoint(filepath, monitor='binary_accuracy', verbose=1, save_best_only=True, mode='max')
+    callbacks_list = [checkpoint]
+
+    # Fit.
+    history = oModel.fit(X_training, Y_training, epochs=epochs, shuffle=True, batch_size=batch_size, callbacks=callbacks_list)
+
+
+    oModel.save(weightfile)
+else:
+    oModel = load_model(weightfile, custom_objects={'mean_pred': mean_pred})
 
 # Evaluate the results
 preds = oModel.evaluate(X_validation, Y_validation)
@@ -131,13 +140,14 @@ print ("Y Pred train Mean : " + str(Y_pred_train.mean()))
 np.savetxt ("Pred_train_y.csv", Y_pred_train)
 
 # summarize history for accuracy
-# plt.plot(history.history['acc'])
+#plt.plot(history.history['acc'])
 # # plt.plot(history.history['val_acc'])
-# plt.title('model accuracy')
-# plt.ylabel('accuracy')
-# plt.xlabel('epoch')
-# # plt.legend(['train', 'test'], loc='upper left')
-# plt.show()
+#plt.title('model accuracy')
+#plt.ylabel('accuracy')
+#plt.xlabel('epoch')
+#plt.legend(['train', 'test'], loc='upper left')
+#plt.show()
+
 # # summarize history for loss
 # plt.plot(history.history['loss'])
 # # plt.plot(history.history['val_loss'])
