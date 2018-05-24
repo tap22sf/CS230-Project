@@ -36,22 +36,24 @@ training_portion = 0.9
 seed = 0 # Random generator
 
 # Optimization parameters
-epochs=20
-batch_size=100
+
+#epochs=1
+epochs=100
+batch_size=75
 
 
-#loss = "binary_crossentropy"
-loss = "mean_squared_error"
+loss = "binary_crossentropy"
+#loss = "mean_squared_error"
 
 # Adam parameters 
-#lr = 0.002
-#beta_1 = 0.9
-#beta_2 = 0.999
-#epsilon = 10 ** (-8)
-#optimizer = Adam(lr=lr, beta_1=beta_1, beta_2=beta_2, epsilon=epsilon)
+lr = 0.004
+beta_1 = 0.9
+beta_2 = 0.999
+epsilon = 10 ** (-8)
+optimizer = Adam(lr=lr, beta_1=beta_1, beta_2=beta_2, epsilon=epsilon)
 
-lr = 0.002
-optimizer = sgd(lr=lr)
+#lr = 0.002
+#optimizer = sgd(lr=lr)
 
 
 ###################################################################################################
@@ -67,7 +69,7 @@ dataFile2Path = os.path.join(parentDir, 'Medical Database/data_y')
 X,Y = loadData(dataFile1Path, dataFile2Path)
 print ("X shape: " + str(X.shape))
 print ("Y shape: " + str(Y.shape))
-print ("Y  mean: " + str(Y.mean()))
+print ("Y Train mean: " + str(Y.mean()))
 
 # Divide into train/dev/test sets
 X_training, Y_training, X_validation, Y_validation = split_dataset(X, Y, training_portion, seed)
@@ -75,6 +77,11 @@ print ("X_training shape: " + str(X_training.shape))
 print ("Y_training shape: " + str(Y_training.shape))
 print ("X_validation shape: " + str(X_validation.shape))
 print ("Y_validation shape: " + str(Y_validation.shape))
+
+print("Y Test set")
+print (Y_validation)
+print ("Y Test Mean : " + str(Y_validation.mean()))
+np.savetxt ("Test_y.csv", Y_validation)
 
 # Build a model 
 oModel = OpioidModel(X[0].shape)
@@ -92,8 +99,14 @@ preds = oModel.evaluate(X_validation, Y_validation)
 oModel.summary()
 
 print()
-print ("Loss = " + str(preds[0]))
+print ("Test Loss = " + str(preds[0]))
 print ("Test Accuracy = " + str(preds[1]))
+#print()
+
+preds = oModel.evaluate(X_training, Y_training)
+print ("Training Loss = " + str(preds[0]))
+print ("Trainign Accuracy = " + str(preds[1]))
+
 #print()
 #for layer in oModel.layers:
 #    weights = layer.get_weights() # list of numpy arrays
@@ -102,7 +115,20 @@ print ("Test Accuracy = " + str(preds[1]))
 # History
 # list all data in history
 # print(history.history.keys())
-print()
+Y_pred = oModel.predict(X_validation, batch_size=None, verbose=0, steps=None) 
+Y_pred_binary = (Y_pred > 0.5)
+
+print("Y Predictions")
+print ("Y Pred Mean : " + str(Y_pred.mean()))
+np.savetxt ("Pred_y.csv", Y_pred)
+
+print("Y Predictions - binary")
+print ("Y Pred Binary Mean : " + str(Y_pred_binary.mean()))
+np.savetxt ("Pred_binary_y.csv", Y_pred_binary)
+
+Y_pred_train = oModel.predict(X_training, batch_size=None, verbose=0, steps=None) 
+print ("Y Pred train Mean : " + str(Y_pred_train.mean()))
+np.savetxt ("Pred_train_y.csv", Y_pred_train)
 
 # summarize history for accuracy
 # plt.plot(history.history['acc'])
