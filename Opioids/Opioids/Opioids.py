@@ -34,20 +34,19 @@ def mean_pred(y_true, y_pred):
 
 # General
 train = True
-weightfile = r'omodel_weights.h5'
+weightfile = 'omodel_weights.h5'
 training_portion = 0.9
 seed = 0 # Random generator
 
 # Optimization parameters
 
-#epochs=1
-epochs=100
-batch_size=16
+epochs= 100
+batch_size=1000
 loss = "binary_crossentropy"
 #loss = "mean_squared_error"
 
 # Adam parameters 
-lr = 0.001
+lr = 0.002
 beta_1 = 0.9
 beta_2 = 0.999
 epsilon = 10 ** (-8)
@@ -96,7 +95,7 @@ if train:
     callbacks_list = [checkpoint]
 
     # Fit.
-    history = oModel.fit(X_training, Y_training, epochs=epochs, shuffle=True, batch_size=batch_size, callbacks=callbacks_list)
+    history = oModel.fit(X_training, Y_training, epochs=epochs, shuffle=True, batch_size=batch_size, callbacks=callbacks_list, validation_split = 0.1)
 
 
     oModel.save(weightfile)
@@ -113,6 +112,7 @@ print ("Test Accuracy = " + str(preds[1]))
 #print()
 
 preds = oModel.evaluate(X_training, Y_training)
+print("Preds str = " + str(preds))
 print ("Training Loss = " + str(preds[0]))
 print ("Trainign Accuracy = " + str(preds[1]))
 
@@ -147,13 +147,17 @@ np.savetxt ("Pred_train_y.csv", Y_pred_train)
 #plt.xlabel('epoch')
 #plt.legend(['train', 'test'], loc='upper left')
 #plt.show()
+print(history.history.keys())
+
 
 # # summarize history for loss
-# plt.plot(history.history['loss'])
-# # plt.plot(history.history['val_loss'])
-# plt.title('model loss')
-# plt.ylabel('loss')
-# plt.xlabel('epoch')
-# # plt.legend(['train', 'test'], loc='upper left')
-# plt.show()
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.plot(history.history['val_binary_accuracy'])
+plt.plot(history.history['binary_accuracy'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['training loss', 'dev loss', 'dev accuracy', 'training accuracy'], loc='upper left')
+plt.show()
 
