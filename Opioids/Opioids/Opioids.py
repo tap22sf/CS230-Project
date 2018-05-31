@@ -34,13 +34,14 @@ def mean_pred(y_true, y_pred):
 
 # General
 train = True
-training_portion = 0.1
+training_portion = 0.2
 test_portion = 0.1
 validation_split = 0.1
 
 weightDir = 'Weights'
 weightfile = weightDir + r'\omodel_weights.h5'
 
+resultsDir = 'Results'
 seed = 0 # Random generator
 
 # Optimization parameters
@@ -84,7 +85,7 @@ print ("Y_test shape: " + str(Y_test.shape))
 print ("X_training shape: " + str(X_training.shape))
 print ("Y_training shape: " + str(Y_training.shape))
 
-np.savetxt ("Test_y.csv", Y_test)
+np.savetxt (resultsDir + r'\Test_y.csv', Y_test)
 
 # Train the model, iterating on the data in batches of 32 samples
 if train:
@@ -119,7 +120,7 @@ if train:
 
     Y_pred_train = oModel.predict(X_training, batch_size=None, verbose=0, steps=None) 
     print ("Y Pred train Mean : " + str(Y_pred_train.mean()))
-    np.savetxt ("Pred_train_y.csv", Y_pred_train)
+    np.savetxt (resultsDir + r'\Pred_train_y.csv', Y_pred_train)
 
 # Evaluate model on test set
 preds = oModel.evaluate(X_test, Y_test)
@@ -131,33 +132,33 @@ Y_pred_binary = (Y_pred > 0.5)
 
 print("Y Predictions")
 print ("Y Pred Mean : " + str(Y_pred.mean()))
-np.savetxt ("Pred_y.csv", Y_pred)
+np.savetxt (resultsDir + r'\Pred_y.csv', Y_pred)
 
 print("Y Predictions - binary")
 print ("Y Pred Binary Mean : " + str(Y_pred_binary.mean()))
-np.savetxt ("Pred_binary_y.csv", Y_pred_binary)
-
-
+np.savetxt (resultsDir + r'\Pred_binary_y.csv', Y_pred_binary)
 
 # summarize history for accuracy
-if dev or train:
+if train:
     print(history.history.keys())
 
     plt.plot(history.history['binary_accuracy'])
-    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_binary_accuracy'])
+    
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
-    #plt.legend(['train', 'test'], loc='upper left')
+    plt.legend(['train', 'test'], loc='upper left')
     plt.show()
-    plt.savefig('History.png')
+    plt.savefig(resultsDir + r'\Accuracy.png')
 
-    # # summarize history for loss
-    # plt.plot(history.history['loss'])
-    # # plt.plot(history.history['val_loss'])
-    # plt.title('model loss')
-    # plt.ylabel('loss')
-    # plt.xlabel('epoch')
-    # # plt.legend(['train', 'test'], loc='upper left')
-    # plt.show()
+    plt.title('model loss')
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.ylabel('Loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+    plt.savefig(resultsDir + r'\Loss.png')
+
 
