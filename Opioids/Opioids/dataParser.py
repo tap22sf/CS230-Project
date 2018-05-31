@@ -71,7 +71,7 @@ def loadDataSet (filename, usecols, norm=False, fake_data=0):
         return data
 
 
-def split_dataset(X, Y, training_portion = 0.9, seed = 0):
+def split_dataset(X, Y, split1=0.1, split2=0.1, seed = 0):
     """
     Arguments:
     X -- input data, of shape (input size, number of examples)
@@ -86,12 +86,14 @@ def split_dataset(X, Y, training_portion = 0.9, seed = 0):
     shuffled_Y = Y[permutation, :]
 
     # Step 2: Partition (shuffled_X, shuffled_Y).
-    num_training = math.floor(training_portion * m) # number of elements for training
+    num_s1 = math.floor(split1 * m)       # number of elements for first split
+    num_s2 = math.floor(split2 * m)     # number of elements for 2nd split
 
-    X_training = shuffled_X[0 : num_training, :]
-    Y_training = shuffled_Y[0 : num_training, :]
+    X1 = shuffled_X[0 : num_s1, :]
+    Y1 = shuffled_Y[0 : num_s1, :]
 
-    X_validation = shuffled_X[num_training : m, :]
-    Y_validation = shuffled_Y[num_training : m, :]
+    X2 = shuffled_X[num_s1 : num_s1 + num_s2, :]
+    Y2 = shuffled_Y[num_s1 : num_s1 + num_s2, :]
     
-    return X_training, Y_training, X_validation, Y_validation
+    
+    return X1, Y1, X2, Y2

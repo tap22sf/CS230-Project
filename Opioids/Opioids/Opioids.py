@@ -34,14 +34,19 @@ def mean_pred(y_true, y_pred):
 
 # General
 train = True
-weightfile = 'omodel_weights.h5'
-training_portion = 0.9
+training_portion = 0.1
+test_portion = 0.1
+
+weightDir = 'Weights'
+weightfile = weightDir + r'\omodel_weights.h5'
+
 seed = 0 # Random generator
 
 # Optimization parameters
 
-epochs= 100
-batch_size=1000
+#epochs=1
+epochs=350
+batch_size=32
 loss = "binary_crossentropy"
 #loss = "mean_squared_error"
 
@@ -72,13 +77,13 @@ print ("Y shape: " + str(Y.shape))
 print ("Y Train mean: " + str(Y.mean()))
 
 # Divide into train/dev/test sets
-X_training, Y_training, X_validation, Y_validation = split_dataset(X, Y, training_portion, seed)
+X_test, Y_test, X_training, Y_training = split_dataset(X, Y, split1=test_portion, split2=training_portion, seed=seed)
+print ("X_test shape: " + str(X_test.shape))
+print ("Y_test shape: " + str(Y_test.shape))
 print ("X_training shape: " + str(X_training.shape))
 print ("Y_training shape: " + str(Y_training.shape))
-print ("X_validation shape: " + str(X_validation.shape))
-print ("Y_validation shape: " + str(Y_validation.shape))
 
-np.savetxt ("Test_y.csv", Y_validation)
+np.savetxt ("Test_y.csv", Y_test)
 
 # Train the model, iterating on the data in batches of 32 samples
 if train:
@@ -90,41 +95,37 @@ if train:
 
     ## Add a callback for saving weights each epoch
     # checkpoint
-    filepath="weights-improvement-{epoch:02d}-{binary_accuracy:.2f}.hdf5"
+    filepath= weightDir + "\\weights-improvement-{epoch:02d}-{binary_accuracy:.2f}.hdf5"
     checkpoint = ModelCheckpoint(filepath, monitor='binary_accuracy', verbose=1, save_best_only=True, mode='max')
     callbacks_list = [checkpoint]
 
-    # Fit.
-    history = oModel.fit(X_training, Y_training, epochs=epochs, shuffle=True, batch_size=batch_size, callbacks=callbacks_list, validation_split = 0.1)
-
+    history = oModel.fit(X_training, Y_training, epochs=epochs, shuffle=False, batch_size=batch_size, callbacks=callbacks_list)
 
     oModel.save(weightfile)
 else:
     oModel = load_model(weightfile, custom_objects={'mean_pred': mean_pred})
 
-# Evaluate the results
-preds = oModel.evaluate(X_validation, Y_validation)
-oModel.summary()
 
+oModel.summary()
 print()
+
+
+# Evaluate the results
+if train:
+    preds = oModel.evaluate(X_training, Y_training)
+    print ("Training Loss = " + str(preds[0]))
+    print ("Training Accuracy = " + str(preds[1]))
+
+    Y_pred_train = oModel.predict(X_training, batch_size=None, verbose=0, steps=None) 
+    print ("Y Pred train Mean : " + str(Y_pred_train.mean()))
+    np.savetxt ("Pred_train_y.csv", Y_pred_train)
+
+# Evaluate model on test set
+preds = oModel.evaluate(X_test, Y_test)
 print ("Test Loss = " + str(preds[0]))
 print ("Test Accuracy = " + str(preds[1]))
-#print()
 
-preds = oModel.evaluate(X_training, Y_training)
-print("Preds str = " + str(preds))
-print ("Training Loss = " + str(preds[0]))
-print ("Trainign Accuracy = " + str(preds[1]))
-
-#print()
-#for layer in oModel.layers:
-#    weights = layer.get_weights() # list of numpy arrays
-#    print(weights)
-
-# History
-# list all data in history
-# print(history.history.keys())
-Y_pred = oModel.predict(X_validation, batch_size=None, verbose=0, steps=None) 
+Y_pred = oModel.predict(X_test, batch_size=None, verbose=0, steps=None) 
 Y_pred_binary = (Y_pred > 0.5)
 
 print("Y Predictions")
@@ -135,29 +136,27 @@ print("Y Predictions - binary")
 print ("Y Pred Binary Mean : " + str(Y_pred_binary.mean()))
 np.savetxt ("Pred_binary_y.csv", Y_pred_binary)
 
-Y_pred_train = oModel.predict(X_training, batch_size=None, verbose=0, steps=None) 
-print ("Y Pred train Mean : " + str(Y_pred_train.mean()))
-np.savetxt ("Pred_train_y.csv", Y_pred_train)
+
 
 # summarize history for accuracy
-#plt.plot(history.history['acc'])
-# # plt.plot(history.history['val_acc'])
-#plt.title('model accuracy')
-#plt.ylabel('accuracy')
-#plt.xlabel('epoch')
-#plt.legend(['train', 'test'], loc='upper left')
-#plt.show()
-print(history.history.keys())
+if dev or train:
+    print(history.history.keys())
 
+    plt.plot(history.history['binary_accuracy'])
+    plt.plot(history.history['loss'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    #plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+    plt.savefig('History.png')
 
-# # summarize history for loss
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.plot(history.history['val_binary_accuracy'])
-plt.plot(history.history['binary_accuracy'])
-plt.title('model loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(['training loss', 'dev loss', 'dev accuracy', 'training accuracy'], loc='upper left')
-plt.show()
+    # # summarize history for loss
+    # plt.plot(history.history['loss'])
+    # # plt.plot(history.history['val_loss'])
+    # plt.title('model loss')
+    # plt.ylabel('loss')
+    # plt.xlabel('epoch')
+    # # plt.legend(['train', 'test'], loc='upper left')
+    # plt.show()
 
