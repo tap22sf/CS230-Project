@@ -32,7 +32,6 @@
   <ItemGroup>
     <Folder Include="Opioids\" />
     <Folder Include="Opioids\Opioids" />
-    <Folder Include="Weights\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

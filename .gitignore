@@ -7,6 +7,7 @@
 *.userosscache
 *.sln.docstates
 *.csv
+Weights/*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -19,7 +20,6 @@
 [Xx]64/
 [Xx]86/
 [Bb]uild/
-Weights/
 bld/
 [Bb]in/
 [Oo]bj/
