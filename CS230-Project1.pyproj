@@ -20,7 +20,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
-    <Content Include="omodel_weights.h5" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
   </ItemGroup>
@@ -33,6 +32,7 @@
   <ItemGroup>
     <Folder Include="Opioids\" />
     <Folder Include="Opioids\Opioids" />
+    <Folder Include="Weights\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

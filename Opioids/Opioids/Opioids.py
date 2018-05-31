@@ -36,6 +36,7 @@ def mean_pred(y_true, y_pred):
 train = True
 training_portion = 0.1
 test_portion = 0.1
+validation_split = 0.1
 
 weightDir = 'Weights'
 weightfile = weightDir + r'\omodel_weights.h5'
@@ -45,7 +46,7 @@ seed = 0 # Random generator
 # Optimization parameters
 
 #epochs=1
-epochs=350
+epochs=50
 batch_size=32
 loss = "binary_crossentropy"
 #loss = "mean_squared_error"
@@ -99,7 +100,7 @@ if train:
     checkpoint = ModelCheckpoint(filepath, monitor='binary_accuracy', verbose=1, save_best_only=True, mode='max')
     callbacks_list = [checkpoint]
 
-    history = oModel.fit(X_training, Y_training, epochs=epochs, shuffle=False, batch_size=batch_size, callbacks=callbacks_list)
+    history = oModel.fit(X_training, Y_training, epochs=epochs, shuffle=False, batch_size=batch_size, callbacks=callbacks_list, validation_split=validation_split)
 
     oModel.save(weightfile)
 else:
