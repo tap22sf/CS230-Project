@@ -4,7 +4,7 @@ from keras.layers import AveragePooling2D, MaxPooling2D, Dropout, GlobalMaxPooli
 from keras.models import Model
 
 
-def OpioidModel(input_shape):
+def OpioidModel(input_shape, dropout_rate):
     """
     Implementation of the OpioidModel.
     
@@ -19,13 +19,13 @@ def OpioidModel(input_shape):
     X_input = Input(input_shape)
 
     X = Dense(2048, input_shape=input_shape, activation='relu', name='fc1')(X_input)
-    X = Dropout(.3)(X)
+    X = Dropout(dropout_rate)(X)
     #X = BatchNormalization()(X)
     X = Dense(1024, activation='relu')(X)
     X = Dense(1024, activation='relu')(X)
     X = Dense(1024, activation='relu')(X)
     X = Dense(1024, activation='relu')(X)
-    X = Dropout(.3)(X)
+    X = Dropout(dropout_rate)(X)
     X = Dense(512, activation='relu')(X)
     #X = Dense(512, activation='relu')(X)
     #X = Dense(512, activation='relu')(X)
