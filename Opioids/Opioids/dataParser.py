@@ -14,7 +14,7 @@ from dataFields import *
 #
 
 def loadData (
-    xFilename = r'..\..\Example Medical Database\df_x_withGeo',
+    xFilename = r'..\..\Example Medical Database\scaled_PCs.csv',
     yFilename = r'..\..\Example Medical Database\data_y'):
     """
     Load data from CSV files.
