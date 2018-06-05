@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3154454b-c680-46a8-a8dd-f6e245664687" name="Default" comment="" />
+    <list default="true" id="3154454b-c680-46a8-a8dd-f6e245664687" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Opioids/Opioids/Opioids.py" beforeDir="false" afterPath="$PROJECT_DIR$/Opioids/Opioids/Opioids.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Opioids/Opioids/analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/Opioids/Opioids/analysis.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,8 +18,8 @@
       <file leaf-file-name="Opioids.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Opioids/Opioids/Opioids.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="385">
-              <caret line="190" column="27" selection-start-line="190" selection-start-column="27" selection-end-line="190" selection-end-column="27" />
+            <state relative-caret-position="1224">
+              <caret line="101" lean-forward="true" selection-start-line="101" selection-end-line="101" />
               <folding>
                 <element signature="e#117#135#0" expanded="true" />
               </folding>
@@ -23,11 +27,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="multiarray.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Library/Caches/PyCharmCE2018.1/python_stubs/-1031435364/numpy/core/multiarray.py">
+      <file leaf-file-name="dataParser.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Opioids/Opioids/dataParser.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="214">
-              <caret line="5342" column="8" selection-start-line="5342" selection-start-column="8" selection-end-line="5342" selection-end-column="8" />
+            <state relative-caret-position="126">
+              <caret line="30" column="44" selection-start-line="30" selection-start-column="36" selection-end-line="30" selection-end-column="44" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dataFields.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Opioids/Opioids/dataFields.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="7" column="64" selection-start-line="7" selection-start-column="64" selection-end-line="7" selection-end-column="64" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -35,28 +51,12 @@
       <file leaf-file-name="analysis.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Opioids/Opioids/analysis.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="28" selection-start-line="28" selection-end-line="28" />
+            <state relative-caret-position="184">
+              <caret line="55" selection-start-line="55" selection-end-line="56" selection-end-column="93" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
             </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="oModel.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Opioids/Opioids/oModel.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="27" column="28" selection-start-line="27" selection-start-column="28" selection-end-line="27" selection-end-column="28" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="dataParser.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Opioids/Opioids/dataParser.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1011" />
           </provider>
         </entry>
       </file>
@@ -72,6 +72,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>resultsDir</find>
+      <find>xusecols</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -83,6 +84,7 @@
         <option value="$PROJECT_DIR$/Opioids/Opioids/oModel.py" />
         <option value="$PROJECT_DIR$/Opioids/Opioids/anlaysis.py" />
         <option value="$PROJECT_DIR$/Opioids/Opioids/analysis.py" />
+        <option value="$PROJECT_DIR$/Opioids/Opioids/dataFields.py" />
         <option value="$PROJECT_DIR$/Opioids/Opioids/Opioids.py" />
       </list>
     </option>
@@ -137,7 +139,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.Opioids">
     <configuration name="Opioids" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="CS230-Project" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -156,9 +158,32 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
+    <configuration name="analysis" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="CS230-Project" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Opioids/Opioids" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Opioids/Opioids/analysis.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.Opioids" />
+      <item itemvalue="Python.analysis" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.Opioids" />
+        <item itemvalue="Python.analysis" />
       </list>
     </recent_temporary>
   </component>
@@ -177,6 +202,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20833333" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -216,28 +242,6 @@
     <entry file="file://$PROJECT_DIR$/Opioids/Opioids/anlaysis.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/Opioids/Opioids/oModel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="27" column="28" selection-start-line="27" selection-start-column="28" selection-end-line="27" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Opioids/Opioids/dataParser.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1011" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Opioids/Opioids/analysis.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="28" selection-start-line="28" selection-end-line="28" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Library/Caches/PyCharmCE2018.1/python_stubs/-1031435364/numpy/core/multiarray.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="214">
@@ -245,10 +249,44 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Opioids/Opioids/oModel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="27" column="28" selection-start-line="27" selection-start-column="28" selection-end-line="27" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Opioids/Opioids/analysis.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="55" selection-start-line="55" selection-end-line="56" selection-end-column="93" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Opioids/Opioids/dataParser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="30" column="44" selection-start-line="30" selection-start-column="36" selection-end-line="30" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Opioids/Opioids/dataFields.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="64" selection-start-line="7" selection-start-column="64" selection-end-line="7" selection-end-column="64" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Opioids/Opioids/Opioids.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="385">
-          <caret line="190" column="27" selection-start-line="190" selection-start-column="27" selection-end-line="190" selection-end-column="27" />
+        <state relative-caret-position="1224">
+          <caret line="101" lean-forward="true" selection-start-line="101" selection-end-line="101" />
           <folding>
             <element signature="e#117#135#0" expanded="true" />
           </folding>

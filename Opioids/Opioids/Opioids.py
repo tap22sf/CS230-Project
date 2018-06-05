@@ -89,8 +89,8 @@ print("Y_trainDev shape: " + str(Y_trainDev.shape))
 
 X_train = X_trainDev[0: int((1-validation_split) * X_trainDev.shape[0]), :]
 Y_train = Y_trainDev[0: int((1-validation_split) * X_trainDev.shape[0]), :]
-X_dev = X_trainDev[(1 - int(validation_split) * X_trainDev.shape[0]): X_trainDev.shape[0], :]
-Y_dev = Y_trainDev[(1 - int(validation_split) * X_trainDev.shape[0]): X_trainDev.shape[0], :]
+X_dev = X_trainDev[int((1 - validation_split) * X_trainDev.shape[0]): X_trainDev.shape[0], :]
+Y_dev = Y_trainDev[int((1 - validation_split) * X_trainDev.shape[0]): X_trainDev.shape[0], :]
 
 #np.savetxt (resultsDir + r'\Test_y.csv', Y_test)
 
