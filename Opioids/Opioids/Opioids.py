@@ -32,38 +32,68 @@ def mean_pred(y_true, y_pred):
 # General
 train = True
 training_portion = .98
-training_portion = .2
+training_portion = .3
 test_portion = 0.01
+
+# Amount of training set to holdout for validation(dev)
 validation_split = 0.1
+
 weightDir = 'Weights'
 resultsDir = 'Results'
 
 seed = 0 # Random generator
 
 # Hyperparameters
-#epochs=1
-epochs = 20
-batch_sizes = [128, 256, 1024, 2048]
-batch_sizes = [1024]
+parameters = []
 
-# Arch evaluation
-layer_sizes = [1, 2, 3, 4]
-layer_sizes = [2]
+# Perferred defaults
+bz = 1024
+epochs = 40
 
-node_sizes  = [256, 512, 1024, 2048, 4096]
-#node_sizes  = [4096]
-dropout_rates = [0, 0.1, 0.3, 0.5]
-dropout_rates = [0.5]
-
-# Adam parameters
-r = [-3.0, -4.0, -5.0, -6.0, -7.0]
-r = [-4.0]
-
-learning_rates = np.power(float(10), np.array(r))
+lr = -3.0
 beta_1 = 0.9
 beta_2 = 0.999
 epsilon = 10 ** (-8)
 loss = "binary_crossentropy"
+
+
+# Model
+layers = 2
+nodes = 2000
+dropout = 0
+
+# batch size scane
+for bz in (128, 256, 512, 1024, 2048):
+    run = {'epochs':10,'batch':bz,'lr' :lr,'layers':2,'nodes':2000, 'dropout':dropout}
+    parameters.append (run)
+
+# Learning rate senstivity tests
+for lr in (-2, -3, -4, -5, -6):
+    run = {'epochs':10,'batch':1024,'lr' :lr,'layers':2,'nodes':2000, 'dropout':dropout}
+    parameters.append (run)
+
+
+
+#epochs=1
+#epochs = 40
+#batch_sizes = [128, 256, 1024, 2048]
+#batch_sizes = [1024]
+
+# Arch evaluation
+#layer_sizes = [1, 2, 3]
+#layer_sizes = [2]
+
+#node_sizes  = [500, 1000, 2000, 3000]
+#node_sizes  = [5000]
+#dropout_rates = [0, 0.3, 0.5]
+#dropout_rates = [0]
+
+# Adam parameters
+#r = [-3.0, -4.0, -5.0]
+#r = [-4.0]
+
+
+
 
 
 ##########################################################################################&#########
@@ -95,129 +125,111 @@ Y_dev = Y_trainDev[int((1 - validation_split) * X_trainDev.shape[0]): X_trainDev
 
 #np.savetxt (resultsDir + r'\Test_y.csv', Y_test)
 
-# Initialization of variables
-trainingLoss = np.zeros((len(learning_rates), len(dropout_rates), len(batch_sizes), len(node_sizes), len(layer_sizes)))
-
-trainingAccuracy = np.zeros(trainingLoss.shape)
-devLoss = np.zeros(trainingLoss.shape)
-devAccuracy = np.zeros(trainingLoss.shape)
-testLoss = np.zeros(trainingLoss.shape)
-testAccuracy = np.zeros(trainingLoss.shape)
-
-np_loss_history = np.zeros((len(learning_rates), len(dropout_rates), len(batch_sizes), len(node_sizes), len(layer_sizes), epochs))
-np_val_loss_history = np.zeros(np_loss_history.shape)
-np_binary_accuracy_history = np.zeros(np_loss_history.shape)
-np_val_binary_accuracy_history = np.zeros(np_loss_history.shape)
-
-# Train the model, iterating on the data in batches of 32 samples
+# Train the model, iterating on the data in batches based on the run database
 if train:
-    for i, lr in enumerate(learning_rates):
-        for j, dr in enumerate(dropout_rates):
-            for k, batch_sz in enumerate(batch_sizes):
-                for l, nodes in enumerate(node_sizes):
-                    for m, layers in enumerate(layer_sizes):
+    for run in parameters:
+        epochs = run ['epochs']
+        batch = run ['batch']
+        lr = run['lr']
+        layers = run['layers']
+        nodes = run['nodes']
+        dr = run['dropout']
 
-                        this_epochs = int(epochs * batch_sz / max(batch_sizes))
+        # adjusting run variables                    
+        lr = np.power(float(10), np.array(lr))
+        print("=== New run" +
+                "  lr="         + str(lr) +
+                ", dr="         + str(dr) + 
+                ", epoch="      + str(epochs) + 
+                ", batch_size=" + str(batch) +
+                ", L:"          + str(layers) +
+                ", N:"          + str(nodes))
+        
+        optimizer = Adam(lr=lr, beta_1=beta_1, beta_2=beta_2, epsilon=epsilon, clipvalue=1)
 
-                        print("Running model with lr=" + str(lr) + ", dr=" + str(dr) + ", epoch=" + str(this_epochs) + ",  batch_size=" + str(batch_sz))
+        # Build a model
+        oModel = OpioidModel(X[0].shape, layers=layers, nodes=nodes, dropout_rate=dr)
 
-                        optimizer = Adam(lr=lr, beta_1=beta_1, beta_2=beta_2, epsilon=epsilon, clipvalue=1)
-                        weightfile = "Weights/omodel_weights-lr" + str(lr) + "-dr" + str(dr) + ".h5"
+        # Optimizer values
+        oModel.compile(optimizer=optimizer, loss=loss, metrics=['binary_accuracy', mean_pred])
 
-                        # Build a model
-                        oModel = OpioidModel(X[0].shape, layers=layers, nodes=nodes, dropout_rate=dr)
+        ## Add a callback for saving weights each epoch
+        filepath = "Weights/Weights+lr" + str(lr) + "+dr" + str(dr) + "+bz" + str(batch) + "+n" + str(nodes) + "+l" + str(layers) +".hdf5"
+        checkpoint = ModelCheckpoint(filepath, monitor='binary_accuracy', verbose=1, save_best_only=True, mode='max')
+        callbacks_list = [checkpoint]
 
-                        # Optimizer values
-                        oModel.compile(optimizer=optimizer, loss=loss, metrics=['binary_accuracy', mean_pred])
+        history = oModel.fit(X_trainDev, Y_trainDev, epochs=epochs, shuffle=False, batch_size=batch, callbacks=callbacks_list, validation_split=validation_split)
 
-                        ## Add a callback for saving weights each epoch
-                        # checkpoint
-                        filepath = "Weights/Weights-lr" + str(lr) + "-dr" + str(dr) + "-batchSize" + str(batch_sz) + "-n" + str(nodes) + "-l" + str(layers) +".hdf5"
-                        checkpoint = ModelCheckpoint(filepath, monitor='binary_accuracy', verbose=1, save_best_only=True, mode='max')
-                        callbacks_list = [checkpoint]
+        #oModel.save(weightfile)
 
-                        history = oModel.fit(X_trainDev, Y_trainDev, epochs=this_epochs, shuffle=False, batch_size=batch_sz, callbacks=callbacks_list, validation_split=validation_split)
+        # Main results
+        train_predictions = oModel.evaluate(X_train, Y_train, verbose=0)
+        dev_preds = oModel.evaluate(X_dev, Y_dev, verbose=0)
+        test_preds = oModel.evaluate(X_test, Y_test, verbose=0)
 
-                        #oModel.save(weightfile)
+        # Save relevant data to csv files
+        csvFileName = "Results/history+lr" + str(lr) + "+dr" + str(dr) + "+bz" + str(batch)  + "+n" + str(nodes) + "+l" + str(layers)+ ".csv"
+        mergedData = np.column_stack((
+                np.array(history.history["loss"]),
+                np.array(history.history["val_loss"]),
+                np.array(history.history['binary_accuracy']),
+                np.array(history.history['val_binary_accuracy'])))
 
-                        # Main results
-                        preds = oModel.evaluate(X_train, Y_train, verbose=0)
-                        trainingLoss[i, j, k, l, m] = preds[0]
-                        trainingAccuracy[i, j, k, l, m] = preds[1]
-                        # Y_pred_train = oModel.predict(X_train, batch_size=None, verbose=0, steps=None)
+        np.savetxt(csvFileName, mergedData, delimiter=",", header="loss, val_loss, binary_accuracy, val_binary_accuracy", comments="")
 
-                        preds = oModel.evaluate(X_dev, Y_dev, verbose=0)
-                        devLoss[i, j, k, l, m] = preds[0]
-                        devAccuracy[i, j, k, l, m] = preds[1]
-                        # Y_pred_dev = oModel.predict(X_dev, batch_size=None, verbose=0, steps=None)
-
-                        preds = oModel.evaluate(X_test, Y_test, verbose=0)
-                        testLoss[i, j, k, l, m] = preds[0]
-                        testAccuracy[i, j, k, l, m] = preds[1]
-                        # Y_pred_test = oModel.pred,ict(X_test, batch_size=None, verbose=0, steps=None)
-
-
-                        # Save relevant data to csv files
-                        np_loss_history = np.array(history.history["loss"])
-                        np_val_loss_history = np.array(history.history["val_loss"])
-                        np_binary_accuracy_history = np.array(history.history['binary_accuracy'])
-                        np_val_binary_accuracy_history = np.array(history.history['val_binary_accuracy'])
-
-                        csvFileName = "Results/history-lr" + str(lr) + "-dr" + str(dr) + "-batchSize" + str(batch_sz)  + "-n" + str(nodes) + "-l" + str(layers)+ ".csv"
-                        mergedData = np.column_stack((np_loss_history, np_val_loss_history,
-                                                        np_binary_accuracy_history, np_val_binary_accuracy_history))
-                        np.savetxt(csvFileName, mergedData, delimiter=",", header="loss, val_loss, binary_accuracy, val_binary_accuracy", comments="")
 #else:
 #    oModel = load_model(weightfile, custom_objects={'mean_pred': mean_pred})
 
 ########################################################################################################################
+# This section need to be a file scanner)
+#
+########################################################################################################################
+#resultsSumm = np.zeros((len(learning_rates)*len(dropout_rates)*len(batch_sizes)*len(node_sizes)*len(layer_sizes), 11))
 
-resultsSumm = np.zeros((len(learning_rates)*len(dropout_rates)*len(batch_sizes)*len(node_sizes)*len(layer_sizes), 11))
+#row = 0
+#for i, lr in enumerate(learning_rates):
+#    for j, dr in enumerate(dropout_rates):
+#        for k, batch_sz in enumerate(batch_sizes):
+#            for l, nodes in enumerate(node_sizes):
+#                for m, layers in enumerate(layer_sizes):
 
-row = 0
-for i, lr in enumerate(learning_rates):
-    for j, dr in enumerate(dropout_rates):
-        for k, batch_sz in enumerate(batch_sizes):
-            for l, nodes in enumerate(node_sizes):
-                for m, layers in enumerate(layer_sizes):
+#                    resultsSumm[row, 0] = lr
+#                    resultsSumm[row, 1] = dr
+#                    resultsSumm[row, 2] = batch_sz
+#                    resultsSumm[row, 3] = nodes
+#                    resultsSumm[row, 4] = layers
 
-                    resultsSumm[row, 0] = lr
-                    resultsSumm[row, 1] = dr
-                    resultsSumm[row, 2] = batch_sz
-                    resultsSumm[row, 3] = nodes
-                    resultsSumm[row, 4] = layers
-
-                    resultsSumm[row, 5] = trainingLoss[i, j, k, l, m]
-                    resultsSumm[row, 6] = trainingAccuracy[i, j, k, l, m]
-                    resultsSumm[row, 7] = devLoss[i, j, k, l, m]
-                    resultsSumm[row, 8] = devAccuracy[i, j, k, l, m]
-                    resultsSumm[row, 9] = testLoss[i, j, k, l, m]
-                    resultsSumm[row, 10] = testAccuracy[i, j, k, l ,m]
-                    row += 1
-
-
-csvFileName = "Results/summary.csv"
-
-format = []
-format.append ("%7.7f")
-format.append ("%3.1f")
-format.append ("%5d")
-format.append ("%5d")
-format.append ("%5d")
-
-format.append ("%6.3f")
-format.append ("%5.3f")
-format.append ("%6.3f")
-format.append ("%5.3f")
-format.append ("%6.3f")
-format.append ("%5.3f")
+#                    resultsSumm[row, 5] = trainingLoss[i, j, k, l, m]
+#                    resultsSumm[row, 6] = trainingAccuracy[i, j, k, l, m]
+#                    resultsSumm[row, 7] = devLoss[i, j, k, l, m]
+#                    resultsSumm[row, 8] = devAccuracy[i, j, k, l, m]
+#                    resultsSumm[row, 9] = testLoss[i, j, k, l, m]
+#                    resultsSumm[row, 10] = testAccuracy[i, j, k, l ,m]
+#                    row += 1
 
 
-np.savetxt(csvFileName, resultsSumm, delimiter=",",
-           header="learning_rate, dropout_rate, batch_size, nodes, layers, trainingLoss, trainingAccuracy, devLoss, devAccuracy, testLoss, testAccuracy",
-           comments="",
-           fmt=format
-           )
+#csvFileName = "Results/summary.csv"
+
+#format = []
+#format.append ("%7.7f")
+#format.append ("%3.1f")
+#format.append ("%5d")
+#format.append ("%5d")
+#format.append ("%5d")
+
+#format.append ("%6.3f")
+#format.append ("%5.3f")
+#format.append ("%6.3f")
+#format.append ("%5.3f")
+#format.append ("%6.3f")
+#format.append ("%5.3f")
+
+
+#np.savetxt(csvFileName, resultsSumm, delimiter=",",
+#           header="learning_rate, dropout_rate, batch_size, nodes, layers, trainingLoss, trainingAccuracy, devLoss, devAccuracy, testLoss, testAccuracy",
+#           comments="",
+#           fmt=format
+#           )
 
 
 
