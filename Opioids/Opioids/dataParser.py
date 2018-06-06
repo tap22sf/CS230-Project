@@ -13,9 +13,7 @@ from dataFields import *
 # Reads an input dataset and converts to np binary for faster futuer loads
 #
 
-def loadData (
-    xFilename = r'..\..\Example Medical Database\scaled_PCs.csv',
-    yFilename = r'..\..\Example Medical Database\data_y'):
+def loadData (xFilename, yFilename):
     """
     Load data from CSV files.
     

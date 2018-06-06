@@ -5,7 +5,7 @@ import os
 absFilePath = os.path.abspath(__file__)
 fileDir = os.path.dirname(absFilePath)
 parentDir = os.path.dirname(os.path.dirname(os.path.dirname(fileDir)))
-dataFile1Path = os.path.join(parentDir, 'Medical Database/scaled.csv')
+dataFile1Path = os.path.join(parentDir, 'Medical Database/withEncodings.csv')
 
 # Read the datasets
 Xpath= dataFile1Path

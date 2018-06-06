@@ -31,38 +31,39 @@ def mean_pred(y_true, y_pred):
 
 # General
 train = True
-training_portion = 0.5
+training_portion = .98
+training_portion = .2
 test_portion = 0.01
 validation_split = 0.1
-
 weightDir = 'Weights'
 resultsDir = 'Results'
+
 seed = 0 # Random generator
 
-# Optimization parameters
-
+# Hyperparameters
 #epochs=1
-epochs = 10
-#batch_sizes = [128, 256, 1024, 2048]
+epochs = 20
+batch_sizes = [128, 256, 1024, 2048]
 batch_sizes = [1024]
-
-loss = "binary_crossentropy"
 
 # Arch evaluation
 layer_sizes = [1, 2, 3, 4]
-node_sizes  = [64, 128, 256, 512, 1024, 2048]
+layer_sizes = [2]
 
+node_sizes  = [256, 512, 1024, 2048, 4096]
+#node_sizes  = [4096]
 dropout_rates = [0, 0.1, 0.3, 0.5]
-dropout_rates = [0.1]
+dropout_rates = [0.5]
 
 # Adam parameters
-#r = [-3.0, -4.0, -5.0, -6.0, -7.0]
-r = [-5.0]
+r = [-3.0, -4.0, -5.0, -6.0, -7.0]
+r = [-4.0]
 
 learning_rates = np.power(float(10), np.array(r))
 beta_1 = 0.9
 beta_2 = 0.999
 epsilon = 10 ** (-8)
+loss = "binary_crossentropy"
 
 
 ##########################################################################################&#########
@@ -71,11 +72,11 @@ epsilon = 10 ** (-8)
 absFilePath = os.path.abspath(__file__)
 fileDir = os.path.dirname(absFilePath)
 parentDir = os.path.dirname(os.path.dirname(os.path.dirname(fileDir)))
-dataFile1Path = os.path.join(parentDir, 'Medical Database/scaled')
-dataFile2Path = os.path.join(parentDir, 'Medical Database/data_y')
+dataFile1Path = os.path.join(parentDir, 'Medical Database\\withEncodings')
+dataFile2Path = os.path.join(parentDir, 'Medical Database\\data_y')
 
 # Read the datasets
-X, Y = loadData(dataFile1Path, dataFile2Path)
+X, Y = loadData(xFilename=dataFile1Path, yFilename=dataFile2Path)
 print("X shape: " + str(X.shape))
 print("Y shape: " + str(Y.shape))
 print("Y Train mean: " + str(Y.mean()))
@@ -171,7 +172,7 @@ if train:
 
 ########################################################################################################################
 
-resultsSumm = np.zeros((len(learning_rates)*len(dropout_rates)*len(batch_sizes), 9))
+resultsSumm = np.zeros((len(learning_rates)*len(dropout_rates)*len(batch_sizes)*len(node_sizes)*len(layer_sizes), 11))
 
 row = 0
 for i, lr in enumerate(learning_rates):
@@ -213,7 +214,7 @@ format.append ("%5.3f")
 
 
 np.savetxt(csvFileName, resultsSumm, delimiter=",",
-           header="learning_rate, dropout_rate, batch_size, trainingLoss, trainingAccuracy, devLoss, devAccuracy, testLoss, testAccuracy",
+           header="learning_rate, dropout_rate, batch_size, nodes, layers, trainingLoss, trainingAccuracy, devLoss, devAccuracy, testLoss, testAccuracy",
            comments="",
            fmt=format
            )
