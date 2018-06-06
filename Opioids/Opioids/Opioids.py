@@ -54,9 +54,7 @@ epsilon = 10 ** (-8)
 loss = "binary_crossentropy"
 
 # Model
-layers = 2
-nodes = 2000
-dropout = 0
+
 
 # Hyperparameters - list of dictionaries to setup training runs
 parameters = []
@@ -67,20 +65,26 @@ parameters = []
 #    run = {'epochs':10,'batch':bz,'lr' :lr,'layers':2,'nodes':2000, 'dropout':dropout}
 #    parameters.append (run)
 
-## Learning rate senstivity tests
-#for lr in (-2, -3, -4, -5, -6):
-#    run = {'epochs':10,'batch':1024,'lr' :lr,'layers':2,'nodes':2000, 'dropout':dropout}
-#    parameters.append (run)
 
 # Node size and layer sensitivity testing
-for n in (500, 1000, 2000, 3000):
-    for l in (0, 1, 2):
-        lr = -3.0
-        epochs = 100
-        dropout = 0.5
-        run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
-        parameters.append (run)
+#for n in (500, 1000, 2000, 3000):
+#    for l in (0, 1, 2):
+#        lr = -3.0
+#        epochs = 100
+#        dropout = 0.5
+#        run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
+#        parameters.append (run)
 
+
+
+## Learning rate senstivity tests
+for lr in (-1, -2, -3, -4, -5, -6):
+    layers = 2
+    nodes = 2000
+    epochs = 100
+    dropout = 0.5
+    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':layers,'nodes':nodes, 'dropout':dropout}
+    parameters.append (run)
 
 
 
@@ -116,15 +120,16 @@ Y_dev = Y_trainDev[int((1 - validation_split) * X_trainDev.shape[0]): X_trainDev
 # Train the model, iterating on the data in batches based on the run database
 if train:
     for run in parameters:
+        
+        # Extract and adjust run variables                    
         epochs = run ['epochs']
         batch = run ['batch']
         lr = run['lr']
+        lr = np.power(float(10), np.array(lr))
         layers = run['layers']
         nodes = run['nodes']
         dr = run['dropout']
 
-        # adjusting run variables                    
-        lr = np.power(float(10), np.array(lr))
         print("=== New run" +
                 "  lr="         + str(lr) +
                 ", dr="         + str(dr) + 
@@ -142,21 +147,17 @@ if train:
         oModel.compile(optimizer=optimizer, loss=loss, metrics=['binary_accuracy', mean_pred])
 
         ## Add a callback for saving weights each epoch
-        filepath = "Weights/Weights+lr" + str(lr) + "+dr" + str(dr) + "+bz" + str(batch) + "+n" + str(nodes) + "+l" + str(layers) +".hdf5"
-        checkpoint = ModelCheckpoint(filepath, monitor='binary_accuracy', verbose=1, save_best_only=True, mode='max')
-        callbacks_list = [checkpoint]
-
-        history = oModel.fit(X_trainDev, Y_trainDev, epochs=epochs, shuffle=False, batch_size=batch, callbacks=callbacks_list, validation_split=validation_split)
-
-        #oModel.save(weightfile)
-
-        # Main results
-        train_predictions = oModel.evaluate(X_train, Y_train, verbose=0)
-        dev_preds = oModel.evaluate(X_dev, Y_dev, verbose=0)
-        test_preds = oModel.evaluate(X_test, Y_test, verbose=0)
+        #filepath = "Weights/Weights+lr" + str(lr) + "+dr" + str(dr) + "+bz" + str(batch) + "+n" + str(nodes) + "+l" + str(layers) +".hdf5"
+        #checkpoint = ModelCheckpoint(filepath, monitor='binary_accuracy', verbose=1, save_best_only=True, mode='max')
+        #callbacks_list = [checkpoint]
+        
+        # Fit the model
+        #history = oModel.fit(X_trainDev, Y_trainDev, epochs=epochs, shuffle=False, batch_size=batch, callbacks=callbacks_list, validation_split=validation_split)
+        history = oModel.fit(X_trainDev, Y_trainDev, epochs=epochs, shuffle=False, batch_size=batch, validation_split=validation_split)
 
         # Save relevant data to csv files
-        csvFileName = "Results/history+lr" + str(lr) + "+dr" + str(dr) + "+bz" + str(batch)  + "+n" + str(nodes) + "+l" + str(layers)+ ".csv"
+        basefilename = "lr" + str(lr) + "+dr" + str(dr) + "+bz" + str(batch)  + "+n" + str(nodes) + "+l" + str(layers)
+        csvFileName = resultsDir + "/history+" + basefilename + ".csv"
         mergedData = np.column_stack((
                 np.array(history.history["loss"]),
                 np.array(history.history["val_loss"]),
@@ -164,14 +165,33 @@ if train:
                 np.array(history.history['val_binary_accuracy'])))
 
         np.savetxt(csvFileName, mergedData, delimiter=",", header="loss, val_loss, binary_accuracy, val_binary_accuracy", comments="")
+        weightfile = weightDir + "/weights+" + basefilename + ".hdf5"
+        oModel.save(weightfile)
+        
+        # Main results
+        train_predictions = oModel.evaluate(X_train, Y_train, verbose=0)
+        dev_preds = oModel.evaluate(X_dev, Y_dev, verbose=0)
+        test_preds = oModel.evaluate(X_test, Y_test, verbose=0)
 
+########################################################################################################################
+# Need a model evaluator for precision/accuracy/recall/F1 + inputs into confusion matrixs - 
+# 
+# Maybe moved to a seperate .py as a astandalone app
+# - read weights and datafiles.
+# - evaluate model
+# - calculate results
+#
+########################################################################################################################
 #else:
 #    oModel = load_model(weightfile, custom_objects={'mean_pred': mean_pred})
 
+
 ########################################################################################################################
-# This section need to be a file scanner)
+# This section need to be a history file scanner - 
+# Maybe moved to a seperate .py as a astandalone app
 #
 ########################################################################################################################
+
 #resultsSumm = np.zeros((len(learning_rates)*len(dropout_rates)*len(batch_sizes)*len(node_sizes)*len(layer_sizes), 11))
 
 #row = 0
