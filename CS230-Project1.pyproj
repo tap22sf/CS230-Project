@@ -28,6 +28,9 @@
     <Compile Include="Opioids\Opioids\dataParser.py" />
     <Compile Include="Opioids\Opioids\oModel.py" />
     <Compile Include="Opioids\Opioids\Opioids.py" />
+    <Compile Include="Opioids\Opioids\summary.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Opioids\" />
