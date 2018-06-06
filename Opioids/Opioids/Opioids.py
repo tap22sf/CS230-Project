@@ -32,7 +32,6 @@ def mean_pred(y_true, y_pred):
 # General
 train = True
 training_portion = .98
-training_portion = .3
 test_portion = 0.01
 
 # Amount of training set to holdout for validation(dev)
@@ -43,9 +42,7 @@ resultsDir = 'Results'
 
 seed = 0 # Random generator
 
-# Hyperparameters
-parameters = []
-
+# Prameters
 # Perferred defaults
 bz = 1024
 epochs = 40
@@ -56,11 +53,14 @@ beta_2 = 0.999
 epsilon = 10 ** (-8)
 loss = "binary_crossentropy"
 
-
 # Model
 layers = 2
 nodes = 2000
 dropout = 0
+
+# Hyperparameters - list of dictionaries to setup training runs
+parameters = []
+
 
 # batch size scane
 #for bz in (128, 256, 512, 1024, 2048):
@@ -72,35 +72,14 @@ dropout = 0
 #    run = {'epochs':10,'batch':1024,'lr' :lr,'layers':2,'nodes':2000, 'dropout':dropout}
 #    parameters.append (run)
 
-# Learning rate senstivity tests
-lr = -3.0
-dropout = 0.5
-run = {'epochs':120,'batch':1024,'lr' :lr,'layers':2,'nodes':2000, 'dropout':dropout}
-parameters.append (run)
-
-lr = -3.0
-dropout = 0.5
-run = {'epochs':120,'batch':1024,'lr' :lr,'layers':2,'nodes':4000, 'dropout':dropout}
-parameters.append (run)
-
-#epochs=1
-#epochs = 40
-#batch_sizes = [128, 256, 1024, 2048]
-#batch_sizes = [1024]
-
-# Arch evaluation
-#layer_sizes = [1, 2, 3]
-#layer_sizes = [2]
-
-#node_sizes  = [500, 1000, 2000, 3000]
-#node_sizes  = [5000]
-#dropout_rates = [0, 0.3, 0.5]
-#dropout_rates = [0]
-
-# Adam parameters
-#r = [-3.0, -4.0, -5.0]
-#r = [-4.0]
-
+# Node size and layer sensitivity testing
+for n in (500, 1000, 2000, 3000):
+    for l in (0, 1, 2):
+        lr = -3.0
+        epochs = 100
+        dropout = 0.5
+        run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
+        parameters.append (run)
 
 
 
