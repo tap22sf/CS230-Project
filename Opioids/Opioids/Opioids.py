@@ -63,16 +63,25 @@ nodes = 2000
 dropout = 0
 
 # batch size scane
-for bz in (128, 256, 512, 1024, 2048):
-    run = {'epochs':10,'batch':bz,'lr' :lr,'layers':2,'nodes':2000, 'dropout':dropout}
-    parameters.append (run)
+#for bz in (128, 256, 512, 1024, 2048):
+#    run = {'epochs':10,'batch':bz,'lr' :lr,'layers':2,'nodes':2000, 'dropout':dropout}
+#    parameters.append (run)
+
+## Learning rate senstivity tests
+#for lr in (-2, -3, -4, -5, -6):
+#    run = {'epochs':10,'batch':1024,'lr' :lr,'layers':2,'nodes':2000, 'dropout':dropout}
+#    parameters.append (run)
 
 # Learning rate senstivity tests
-for lr in (-2, -3, -4, -5, -6):
-    run = {'epochs':10,'batch':1024,'lr' :lr,'layers':2,'nodes':2000, 'dropout':dropout}
-    parameters.append (run)
+lr = -3.0
+dropout = 0.5
+run = {'epochs':120,'batch':1024,'lr' :lr,'layers':2,'nodes':2000, 'dropout':dropout}
+parameters.append (run)
 
-
+lr = -3.0
+dropout = 0.5
+run = {'epochs':120,'batch':1024,'lr' :lr,'layers':2,'nodes':4000, 'dropout':dropout}
+parameters.append (run)
 
 #epochs=1
 #epochs = 40
