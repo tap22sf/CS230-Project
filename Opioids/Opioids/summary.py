@@ -12,7 +12,7 @@ resultsDir = r'.'
 # Open a summary file
 with open(resultsDir+'\\summary.csv', 'w', newline='') as summaryfile:
     writer = csv.writer(summaryfile, delimiter=',')
-    writer.writerow(["learning_rate", "dropout_rate", "batch_size", "nodes", "layers", "trainingLoss", "trainingAccuracy", "devLoss", "devAccuracy", "testLoss", "testAccuracy"])
+    writer.writerow(["learning_rate", "dropout_rate", "batch_size", "nodes", "layers", "trainingLoss", "devLoss", "testLoss", "trainingAccuracy",  "devAccuracy", "testAccuracy"])
 
     for file in os.listdir(resultsDir):
 
