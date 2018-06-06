@@ -30,7 +30,7 @@ with open(resultsDir+'\\summary.csv', 'w', newline='') as summaryfile:
 
                 metric[0][0],
                 metric[0][1],
+                metric[0][2],
                 metric[1][0],
                 metric[1][1],
-                metric[2][0],
-                metric[2][1]])
+                metric[1][2]])
