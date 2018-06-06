@@ -69,7 +69,7 @@ def loadDataSet (filename, usecols, norm=False, fake_data=0):
         return data
 
 
-def split_dataset(X, Y, split1=0.1, split2=0.1, seed = 0):
+def split_dataset(X, Y, split1=0.1, split2=0.1, shuffle=True, seed=0):
     """
     Arguments:
     X -- input data, of shape (input size, number of examples)
@@ -77,11 +77,15 @@ def split_dataset(X, Y, split1=0.1, split2=0.1, seed = 0):
     
     np.random.seed(seed)            # To make your "random" minibatches the same as ours
     m = X.shape[0]                  # number of examples
-        
+
     # Step 1: Shuffle (X, Y)
-    permutation = list(np.random.permutation(m))
-    shuffled_X = X[permutation, :]
-    shuffled_Y = Y[permutation, :]
+    if shuffle:
+        permutation = list(np.random.permutation(m))
+        shuffled_X = X[permutation, :]
+        shuffled_Y = Y[permutation, :]
+    else:
+        shuffled_X = X
+        shuffled_Y = Y
 
     # Step 2: Partition (shuffled_X, shuffled_Y).
     num_s1 = math.floor(split1 * m)       # number of elements for first split

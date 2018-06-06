@@ -29,6 +29,6 @@ def OpioidModel(input_shape, layers, nodes, dropout_rate):
     predictions = Dense(1, activation='sigmoid')(X)
 
     # Create model
-    model = Model(inputs = X_input, outputs = predictions, name='OpioidModel')
+    model = Model(inputs=X_input, outputs=predictions, name='OpioidModel')
     
     return model

@@ -76,19 +76,19 @@ parameters = []
 #    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':layers,'nodes':nodes, 'dropout':dropout}
 #    parameters.append (run)
 
-# Learning rate senstivity tests
+# Learning rate sensitivity tests
 lr = -3
 layers = 2
 nodes = 2000
 epochs = 50
+# epochs = 2
 dropout = 0.5
 
-# batch size scane
+# batch size scan
 for bz in (32, 64, 128, 256, 512, 1024, 2048, 4096):
-    run = {'epochs':epochs,'batch':bz,'lr':lr,'layers':layers,'nodes':nodes, 'dropout':dropout}
-    parameters.append (run)
-
-
+# for bz in (10000, 20000):
+    run = {'epochs': epochs, 'batch': bz, 'lr': lr, 'layers': layers, 'nodes': nodes, 'dropout': dropout}
+    parameters.append(run)
 
 
 ##########################################################################################&#########
@@ -97,36 +97,31 @@ for bz in (32, 64, 128, 256, 512, 1024, 2048, 4096):
 absFilePath = os.path.abspath(__file__)
 fileDir = os.path.dirname(absFilePath)
 parentDir = os.path.dirname(os.path.dirname(os.path.dirname(fileDir)))
-dataFile1Path = os.path.join(parentDir, 'Medical Database\\withEncodings')
-dataFile2Path = os.path.join(parentDir, 'Medical Database\\data_y')
+dataFile1Path = os.path.join(parentDir, 'Medical Database/withEncodings')
+dataFile2Path = os.path.join(parentDir, 'Medical Database/data_y')
 
 # Read the datasets
 X, Y = loadData(xFilename=dataFile1Path, yFilename=dataFile2Path)
 print("X shape: " + str(X.shape))
 print("Y shape: " + str(Y.shape))
-print("Y Train mean: " + str(Y.mean()))
 
 # Divide into train/dev/test sets
-X_test, Y_test, X_trainDev, Y_trainDev = split_dataset(X, Y, split1=test_portion, split2=training_portion, seed=seed)
+X_test, Y_test, X_trainDev, Y_trainDev = split_dataset(X, Y, split1=test_portion, split2=training_portion, shuffle=True, seed=seed)
+X_train, Y_train, X_dev, Y_dev = split_dataset(X_trainDev, Y_trainDev, split1=(1 - validation_split), split2=validation_split, shuffle=False)
+print("X_train shape: " + str(X_train.shape))
+print("Y_train shape: " + str(Y_train.shape))
 print("X_test shape: " + str(X_test.shape))
 print("Y_test shape: " + str(Y_test.shape))
-print("X_trainDev shape: " + str(X_trainDev.shape))
-print("Y_trainDev shape: " + str(Y_trainDev.shape))
-
-X_train = X_trainDev[0: int((1-validation_split) * X_trainDev.shape[0]), :]
-Y_train = Y_trainDev[0: int((1-validation_split) * X_trainDev.shape[0]), :]
-X_dev = X_trainDev[int((1 - validation_split) * X_trainDev.shape[0]): X_trainDev.shape[0], :]
-Y_dev = Y_trainDev[int((1 - validation_split) * X_trainDev.shape[0]): X_trainDev.shape[0], :]
-
-
+print("X_dev shape: " + str(X_dev.shape))
+print("Y_dev shape: " + str(Y_dev.shape))
 
 # Train the model, iterating on the data in batches based on the run database
 if train:
     for run in parameters:
         
         # Extract and adjust run variables                    
-        epochs = run ['epochs']
-        batch = run ['batch']
+        epochs = run['epochs']
+        batch = run['batch']
         lr = run['lr']
         lr = np.power(float(10), np.array(lr))
         layers = run['layers']
@@ -159,7 +154,7 @@ if train:
         history = oModel.fit(X_trainDev, Y_trainDev, epochs=epochs, shuffle=False, batch_size=batch, validation_split=validation_split)
 
         # Save relevant data to csv files
-        basefilename = "lr" + str(lr) + "+dr" + str(dr) + "+bz" + str(batch)  + "+n" + str(nodes) + "+l" + str(layers)
+        basefilename = "lr" + str(lr) + "+dr" + str(dr) + "+bz" + str(batch) + "+n" + str(nodes) + "+l" + str(layers)
         csvFileName = resultsDir + "/history+" + basefilename + ".csv"
         mergedData = np.column_stack((
                 np.array(history.history["loss"]),
@@ -173,6 +168,7 @@ if train:
         
         # Evaluate metrics
         print("Metric Calculations")
+        print(oModel.metrics_names)
         train_metrics = oModel.evaluate(X_train, Y_train, verbose=1)
         dev_metrics = oModel.evaluate(X_dev, Y_dev, verbose=1)
         test_metrics = oModel.evaluate(X_test, Y_test, verbose=1)
@@ -181,33 +177,33 @@ if train:
                 
         metric_file = resultsDir + "/metrics+" + basefilename + ".csv"
         format = []
-        format.append ("%5.3f")
-        format.append ("%5.3f")
-        format.append ("%5.3f")
-        np.savetxt (metric_file, mergedMetrics, delimiter=",", header= "train, dev, test", fmt=format)
+        format.append("%5.3f")
+        format.append("%5.3f")
+        format.append("%5.3f")
+        np.savetxt(metric_file, mergedMetrics, delimiter=",", header= "train, dev, test", fmt=format)
 
         # Save predictions
         print("Prediction Calculations")
         pred_train_name = resultsDir + "/pred_train+" + basefilename + ".csv"
         predictions_train = oModel.predict(X_train, verbose=1) 
-        np.savetxt (pred_train_name, predictions_train)
+        np.savetxt(pred_train_name, predictions_train)
 
         pred_dev_name = resultsDir + "/pred_dev+" + basefilename + ".csv"
         predictions_dev = oModel.predict(X_dev, verbose=1) 
-        np.savetxt (pred_dev_name, predictions_dev)
+        np.savetxt(pred_dev_name, predictions_dev)
 
         pred_test_name = resultsDir + "/pred_test+" + basefilename + ".csv"
         predictions_test = oModel.predict(X_test, verbose=1) 
-        np.savetxt (pred_test_name, predictions_test)
+        np.savetxt(pred_test_name, predictions_test)
 
         # known good output
         print("Writting known outputs")
         train_name = resultsDir + "/known_train+" + basefilename + ".csv"
-        np.savetxt (train_name, Y_train)
+        np.savetxt(train_name, Y_train)
         dev_name = resultsDir + "/known_dev+" + basefilename + ".csv"
-        np.savetxt (dev_name, Y_dev)
+        np.savetxt(dev_name, Y_dev)
         test_name = resultsDir + "/known_test+" + basefilename + ".csv"
-        np.savetxt (test_name, Y_test)
+        np.savetxt(test_name, Y_test)
 
 
 ########################################################################################################################
@@ -223,58 +219,7 @@ if train:
 #    oModel = load_model(weightfile, custom_objects={'mean_pred': mean_pred})
 
 
-########################################################################################################################
-# This section need to be a history file scanner - 
-# Maybe moved to a seperate .py as a astandalone app
-#
-########################################################################################################################
 
-#resultsSumm = np.zeros((len(learning_rates)*len(dropout_rates)*len(batch_sizes)*len(node_sizes)*len(layer_sizes), 11))
-
-#row = 0
-#for i, lr in enumerate(learning_rates):
-#    for j, dr in enumerate(dropout_rates):
-#        for k, batch_sz in enumerate(batch_sizes):
-#            for l, nodes in enumerate(node_sizes):
-#                for m, layers in enumerate(layer_sizes):
-
-#                    resultsSumm[row, 0] = lr
-#                    resultsSumm[row, 1] = dr
-#                    resultsSumm[row, 2] = batch_sz
-#                    resultsSumm[row, 3] = nodes
-#                    resultsSumm[row, 4] = layers
-
-#                    resultsSumm[row, 5] = trainingLoss[i, j, k, l, m]
-#                    resultsSumm[row, 6] = trainingAccuracy[i, j, k, l, m]
-#                    resultsSumm[row, 7] = devLoss[i, j, k, l, m]
-#                    resultsSumm[row, 8] = devAccuracy[i, j, k, l, m]
-#                    resultsSumm[row, 9] = testLoss[i, j, k, l, m]
-#                    resultsSumm[row, 10] = testAccuracy[i, j, k, l ,m]
-#                    row += 1
-
-
-#csvFileName = "Results/summary.csv"
-
-#format = []
-#format.append ("%7.7f")
-#format.append ("%3.1f")
-#format.append ("%5d")
-#format.append ("%5d")
-#format.append ("%5d")
-
-#format.append ("%6.3f")
-#format.append ("%5.3f")
-#format.append ("%6.3f")
-#format.append ("%5.3f")
-#format.append ("%6.3f")
-#format.append ("%5.3f")
-
-
-#np.savetxt(csvFileName, resultsSumm, delimiter=",",
-#           header="learning_rate, dropout_rate, batch_size, nodes, layers, trainingLoss, trainingAccuracy, devLoss, devAccuracy, testLoss, testAccuracy",
-#           comments="",
-#           fmt=format
-#           )
 
 
 
