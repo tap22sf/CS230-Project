@@ -1,7 +1,7 @@
 #
 # Opiods.py - Main Application to train network to detect likelihood of opiod adiction following lumbar surgey
 # 
-
+import os
 import numpy as np
 import tensorflow as tf
 
@@ -9,19 +9,14 @@ from keras.utils import layer_utils
 from keras.utils.data_utils import get_file
 from keras.applications.imagenet_utils import preprocess_input
 from keras.callbacks import ModelCheckpoint
-
 from keras.utils.vis_utils import model_to_dot
 from keras.utils import plot_model
 from keras.optimizers import *
 from keras.models import load_model
-
 import keras.backend as K
 
 from dataParser import *
 from oModel import *
-
-import os
-
 
 def mean_pred(y_true, y_pred):
     return K.mean(y_pred)
@@ -31,10 +26,10 @@ def mean_pred(y_true, y_pred):
 
 # General
 train = True
-training_portion = .98
+training_portion = .30
 test_portion = 0.01
 
-# Amount of training set to holdout for validation(dev)
+# Amount of training set to holdout for validation (dev set)
 validation_split = 0.1
 
 weightDir = 'Weights'
@@ -60,11 +55,6 @@ loss = "binary_crossentropy"
 parameters = []
 
 
-# batch size scane
-#for bz in (128, 256, 512, 1024, 2048):
-#    run = {'epochs':10,'batch':bz,'lr' :lr,'layers':2,'nodes':2000, 'dropout':dropout}
-#    parameters.append (run)
-
 
 # Node size and layer sensitivity testing
 #for n in (500, 1000, 2000, 3000):
@@ -78,13 +68,26 @@ parameters = []
 
 
 ## Learning rate senstivity tests
-for lr in (-1, -2, -3, -4, -5, -6):
-    layers = 2
-    nodes = 2000
-    epochs = 100
-    dropout = 0.5
-    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':layers,'nodes':nodes, 'dropout':dropout}
+#for lr in (-2, -3, -4, -5):
+#    layers = 2
+#    nodes = 2000
+#    epochs = 100
+#    dropout = 0.5
+#    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':layers,'nodes':nodes, 'dropout':dropout}
+#    parameters.append (run)
+
+# Learning rate senstivity tests
+lr = -3
+layers = 2
+nodes = 2000
+epochs = 50
+dropout = 0.5
+
+# batch size scane
+for bz in (32, 64, 128, 256, 512, 1024, 2048, 4096):
+    run = {'epochs':epochs,'batch':bz,'lr':lr,'layers':layers,'nodes':nodes, 'dropout':dropout}
     parameters.append (run)
+
 
 
 
@@ -115,7 +118,7 @@ Y_train = Y_trainDev[0: int((1-validation_split) * X_trainDev.shape[0]), :]
 X_dev = X_trainDev[int((1 - validation_split) * X_trainDev.shape[0]): X_trainDev.shape[0], :]
 Y_dev = Y_trainDev[int((1 - validation_split) * X_trainDev.shape[0]): X_trainDev.shape[0], :]
 
-#np.savetxt (resultsDir + r'\Test_y.csv', Y_test)
+
 
 # Train the model, iterating on the data in batches based on the run database
 if train:
@@ -138,12 +141,12 @@ if train:
                 ", L:"          + str(layers) +
                 ", N:"          + str(nodes))
         
-        optimizer = Adam(lr=lr, beta_1=beta_1, beta_2=beta_2, epsilon=epsilon, clipvalue=1)
 
         # Build a model
         oModel = OpioidModel(X[0].shape, layers=layers, nodes=nodes, dropout_rate=dr)
 
         # Optimizer values
+        optimizer = Adam(lr=lr, beta_1=beta_1, beta_2=beta_2, epsilon=epsilon, clipvalue=1)
         oModel.compile(optimizer=optimizer, loss=loss, metrics=['binary_accuracy', mean_pred])
 
         ## Add a callback for saving weights each epoch
@@ -168,10 +171,44 @@ if train:
         weightfile = weightDir + "/weights+" + basefilename + ".hdf5"
         oModel.save(weightfile)
         
-        # Main results
-        train_predictions = oModel.evaluate(X_train, Y_train, verbose=0)
-        dev_preds = oModel.evaluate(X_dev, Y_dev, verbose=0)
-        test_preds = oModel.evaluate(X_test, Y_test, verbose=0)
+        # Evaluate metrics
+        print("Metric Calculations")
+        train_metrics = oModel.evaluate(X_train, Y_train, verbose=1)
+        dev_metrics = oModel.evaluate(X_dev, Y_dev, verbose=1)
+        test_metrics = oModel.evaluate(X_test, Y_test, verbose=1)
+
+        mergedMetrics = np.column_stack((train_metrics, dev_metrics, test_metrics))
+                
+        metric_file = resultsDir + "/metrics+" + basefilename + ".csv"
+        format = []
+        format.append ("%5.3f")
+        format.append ("%5.3f")
+        format.append ("%5.3f")
+        np.savetxt (metric_file, mergedMetrics, delimiter=",", header= "train, dev, test", fmt=format)
+
+        # Save predictions
+        print("Prediction Calculations")
+        pred_train_name = resultsDir + "/pred_train+" + basefilename + ".csv"
+        predictions_train = oModel.predict(X_train, verbose=1) 
+        np.savetxt (pred_train_name, predictions_train)
+
+        pred_dev_name = resultsDir + "/pred_dev+" + basefilename + ".csv"
+        predictions_dev = oModel.predict(X_dev, verbose=1) 
+        np.savetxt (pred_dev_name, predictions_dev)
+
+        pred_test_name = resultsDir + "/pred_test+" + basefilename + ".csv"
+        predictions_test = oModel.predict(X_test, verbose=1) 
+        np.savetxt (pred_test_name, predictions_test)
+
+        # known good output
+        print("Writting known outputs")
+        train_name = resultsDir + "/known_train+" + basefilename + ".csv"
+        np.savetxt (train_name, Y_train)
+        dev_name = resultsDir + "/known_dev+" + basefilename + ".csv"
+        np.savetxt (dev_name, Y_dev)
+        test_name = resultsDir + "/known_test+" + basefilename + ".csv"
+        np.savetxt (test_name, Y_test)
+
 
 ########################################################################################################################
 # Need a model evaluator for precision/accuracy/recall/F1 + inputs into confusion matrixs - 
