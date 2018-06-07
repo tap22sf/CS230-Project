@@ -24,11 +24,11 @@ def mean_pred(y_true, y_pred):
 ###################################################################################################
 # Parameters
 
-training_portion = .30
-test_portion = 0.01
+training_portion = .90
+test_portion = 0.05
 
 # Amount of training set to holdout for validation (dev set)
-validation_split = 0.1
+validation_split = 0.055
 
 weightDir = 'Weights'
 resultsDir = 'Results'
@@ -57,7 +57,7 @@ for n in (500, 1000, 2000, 3000):
     for l in (0, 1, 2):
         lr = -3.0
         epochs = 100
-        dropout = 0.5
+        dropout = 0.3
         bz = 8192
         run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
         parameters.append (run)
