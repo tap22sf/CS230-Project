@@ -15,6 +15,8 @@ from keras.optimizers import *
 from keras.models import load_model
 import keras.backend as K
 
+from tensorflow.python import debug as tf_debug
+
 from dataParser import *
 from oModel import *
 
@@ -44,25 +46,33 @@ loss = "binary_crossentropy"
 # Hyperparameters - list of dictionaries to setup training runs
 parameters = []
 
-# Architecture evalaluation
-for n in (250, 300, 400):
-    for l in (1, 2, 3):
-        lr = -3.0
-        epochs = 50
-        dropout = 0.45
-        bz = 8192
-        run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
-        parameters.append (run)
+# Baseline best Architecture (overfits trainign set)
+n = 500
+l = 2
+beta_1 = 0.90
+beta_2 = 0.999
+lr = -3.0
+epochs = 100
+dropout = 0.0
+bz = 4096
+#run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
+#parameters.append (run)
 
 # Architecture evalaluation
-#for n in (300, 400):
-#    l = 6
-#    lr = -3.0
-#    epochs = 100
-#    dropout = 0.75
-#    bz = 8192
+#for n in (100, 200, 300, 400, 500, 600):
 #    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
 #    parameters.append (run)
+
+
+# Dropout evalaluation
+#for d in range(0,6):
+n = 2000
+epochs = 500
+d = 5
+dropout = d/10
+run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
+parameters.append (run)
+
 
 ## Learning rate senstivity tests
 #for lr in (-2, -3, -4, -5):
@@ -123,6 +133,10 @@ Y_dev = Y_trainDev[int((1 - validation_split) * X_trainDev.shape[0]): X_trainDev
 #
 ##########################################################################################&#########
 for run in parameters:
+
+    #sess = K.get_session()
+    #sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+    #K.set_session(sess)
         
     # Extract and adjust run variables                    
     epochs = run ['epochs']
@@ -146,7 +160,9 @@ for run in parameters:
     oModel.summary()
 
     # Optimizer values
-    optimizer = Adam(lr=lr, beta_1=beta_1, beta_2=beta_2, epsilon=epsilon, clipvalue=1)
+    optimizer = Adam(lr=lr, beta_1=beta_1, beta_2=beta_2, epsilon=epsilon)
+    #optimizer = SGD()
+    
     oModel.compile(optimizer=optimizer, loss=loss, metrics=['binary_accuracy', mean_pred])
 
     ## Add a callback for saving weights each epoch
@@ -170,43 +186,46 @@ for run in parameters:
     np.savetxt(csvFileName, mergedData, delimiter=",", header="loss, val_loss, binary_accuracy, val_binary_accuracy", comments="")
     weightfile = weightDir + "/weights+" + basefilename + ".hdf5"
     oModel.save(weightfile)
-        
-    # Evaluate metrics
-    print("Metric Calculations")
-    train_metrics = oModel.evaluate(X_train, Y_train, verbose=1)
-    dev_metrics = oModel.evaluate(X_dev, Y_dev, verbose=1)
-    test_metrics = oModel.evaluate(X_test, Y_test, verbose=1)
+    
+    doMetrics = True
 
-    mergedMetrics = np.column_stack((train_metrics, dev_metrics, test_metrics))
+    if doMetrics:
+        # Evaluate metrics
+        print("Metric Calculations")
+        train_metrics = oModel.evaluate(X_train, Y_train, verbose=1)
+        dev_metrics = oModel.evaluate(X_dev, Y_dev, verbose=1)
+        test_metrics = oModel.evaluate(X_test, Y_test, verbose=1)
+
+        mergedMetrics = np.column_stack((train_metrics, dev_metrics, test_metrics))
                 
-    metric_file = resultsDir + "/metrics+" + basefilename + ".csv"
-    format = []
-    format.append ("%5.3f")
-    format.append ("%5.3f")
-    format.append ("%5.3f")
-    np.savetxt (metric_file, mergedMetrics, delimiter=",", header= "train, dev, test", fmt=format)
+        metric_file = resultsDir + "/metrics+" + basefilename + ".csv"
+        format = []
+        format.append ("%5.3f")
+        format.append ("%5.3f")
+        format.append ("%5.3f")
+        np.savetxt (metric_file, mergedMetrics, delimiter=",", header= "train, dev, test", fmt=format)
 
-    # Save predictions
-    print("Prediction Calculations")
-    pred_train_name = resultsDir + "/pred_train+" + basefilename + ".csv"
-    predictions_train = oModel.predict(X_train, verbose=1) 
-    np.savetxt (pred_train_name, predictions_train)
+        # Save predictions
+        print("Prediction Calculations")
+        pred_train_name = resultsDir + "/pred_train+" + basefilename + ".csv"
+        predictions_train = oModel.predict(X_train, verbose=1) 
+        np.savetxt (pred_train_name, predictions_train)
 
-    pred_dev_name = resultsDir + "/pred_dev+" + basefilename + ".csv"
-    predictions_dev = oModel.predict(X_dev, verbose=1) 
-    np.savetxt (pred_dev_name, predictions_dev)
+        pred_dev_name = resultsDir + "/pred_dev+" + basefilename + ".csv"
+        predictions_dev = oModel.predict(X_dev, verbose=1) 
+        np.savetxt (pred_dev_name, predictions_dev)
 
-    pred_test_name = resultsDir + "/pred_test+" + basefilename + ".csv"
-    predictions_test = oModel.predict(X_test, verbose=1) 
-    np.savetxt (pred_test_name, predictions_test)
+        pred_test_name = resultsDir + "/pred_test+" + basefilename + ".csv"
+        predictions_test = oModel.predict(X_test, verbose=1) 
+        np.savetxt (pred_test_name, predictions_test)
 
-    # known good output
-    print("Writting known outputs")
-    train_name = resultsDir + "/known_train+" + basefilename + ".csv"
-    np.savetxt (train_name, Y_train)
-    dev_name = resultsDir + "/known_dev+" + basefilename + ".csv"
-    np.savetxt (dev_name, Y_dev)
-    test_name = resultsDir + "/known_test+" + basefilename + ".csv"
-    np.savetxt (test_name, Y_test)
+        # known good output
+        print("Writting known outputs")
+        train_name = resultsDir + "/known_train+" + basefilename + ".csv"
+        np.savetxt (train_name, Y_train)
+        dev_name = resultsDir + "/known_dev+" + basefilename + ".csv"
+        np.savetxt (dev_name, Y_dev)
+        test_name = resultsDir + "/known_test+" + basefilename + ".csv"
+        np.savetxt (test_name, Y_test)
 
 

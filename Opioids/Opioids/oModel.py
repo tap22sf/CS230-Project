@@ -19,8 +19,7 @@ def OpioidModel(input_shape, layers, nodes, dropout_rate):
     X_input = Input(input_shape)
 
     X = Dense(nodes, input_shape=input_shape, activation='relu')(X_input)
-    #X = BatchNormalization()(X)
-
+    
     # Variable number of layers used during arch sensitivity testing
     for i in range(layers):
         X = Dropout(dropout_rate)(X)
