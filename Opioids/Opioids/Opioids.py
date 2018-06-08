@@ -42,36 +42,41 @@ beta_1 = 0.9
 beta_2 = 0.999
 epsilon = 10 ** (-8)
 loss = "binary_crossentropy"
+#loss = "mean_squared_error"
+#loss = "hinge"
 
 # Hyperparameters - list of dictionaries to setup training runs
 parameters = []
 
 # Baseline best Architecture (overfits trainign set)
 n = 500
-l = 2
+l = 3
 beta_1 = 0.90
 beta_2 = 0.999
 lr = -3.0
 epochs = 100
 dropout = 0.0
-bz = 4096
-#run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
-#parameters.append (run)
+l2reg = 0.0
+bz = 8192
+
 
 # Architecture evalaluation
-#for n in (100, 200, 300, 400, 500, 600):
-#    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
-#    parameters.append (run)
+for n in (100, 200, 300, 400, 500, 600):
+    for l in (1, 2, 3):
+        epochs = 100
+        run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout, 'l2reg':l2reg}
+        parameters.append (run)
+
+
+# Best arch
 
 
 # Dropout evalaluation
 #for d in range(0,6):
-n = 2000
-epochs = 500
-d = 5
-dropout = d/10
-run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
-parameters.append (run)
+#    dropout = dataFile1Path/10
+#    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
+#    parameters.append (run)
+
 
 
 ## Learning rate senstivity tests
@@ -146,17 +151,19 @@ for run in parameters:
     layers = run['layers']
     nodes = run['nodes']
     dr = run['dropout']
+    l2reg = run['l2reg']
 
     print("=== New run" +
             "  lr="         + str(lr) +
             ", dr="         + str(dr) + 
+            ", l2="         + str(l2reg) + 
             ", epoch="      + str(epochs) + 
             ", batch_size=" + str(batch) +
             ", L:"          + str(layers) +
             ", N:"          + str(nodes))
         
     # Build a model
-    oModel = OpioidModel(X[0].shape, layers=layers, nodes=nodes, dropout_rate=dr)
+    oModel = OpioidModel(X[0].shape, layers=layers, nodes=nodes, dropout_rate=dr, l2reg=l2reg)
     oModel.summary()
 
     # Optimizer values
@@ -175,7 +182,7 @@ for run in parameters:
     history = oModel.fit(X_trainDev, Y_trainDev, epochs=epochs, shuffle=False, batch_size=batch, validation_split=validation_split)
 
     # Save relevant data to csv files
-    basefilename = "lr+" + str(lr) + "+dr+" + str(dr) + "+bz+" + str(batch)  + "+n+" + str(nodes) + "+l+" + str(layers)
+    basefilename = "e+" + str(epochs) + "+lr+" + str(lr) + "+dr+" + str(dr) + "+l2+" + str(l2reg) + "+bz+" + str(batch)  + "+n+" + str(nodes) + "+l+" + str(layers)
     csvFileName = resultsDir + "/history+" + basefilename + ".csv"
     mergedData = np.column_stack((
             np.array(history.history["loss"]),
