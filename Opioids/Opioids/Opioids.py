@@ -61,33 +61,39 @@ bz = 8192
 
 
 # Architecture evalaluation
-for n in (100, 200, 300, 400, 500, 600):
-    for l in (1, 2, 3):
-        epochs = 100
-        run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout, 'l2reg':l2reg}
-        parameters.append (run)
-
+#for n in (100, 200, 300, 400, 500, 600):
+#    for l in (1, 2, 3):
+#        epochs = 100
+#        run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout, 'l2reg':l2reg}
+#        parameters.append (run)
 
 # Best arch
-
-
-# Dropout evalaluation
-#for d in range(0,6):
-#    dropout = dataFile1Path/10
-#    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout}
-#    parameters.append (run)
-
-
+n = 500
+l = 3
+epochs = 100
 
 ## Learning rate senstivity tests
-#for lr in (-2, -3, -4, -5):
-#    layers = 3
-#    nodes = 250
-#    epochs = 25
-#    dropout = 0.5
-#    bz = 8192
-#    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':layers,'nodes':nodes, 'dropout':dropout}
+#for lr in (-2, -3, -4, -5, -6, -7):
+#    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout, 'l2reg':l2reg}
 #    parameters.append (run)
+
+lr = -3
+
+# Dropout evalaluation
+for d in range(0,6):
+    dropout = d/10
+    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout, 'l2reg':l2reg}
+    parameters.append (run)
+
+
+# L2 Regularization search
+#for l2reg in (0.0001,  0.0002, .00001, .000001):
+#    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout, 'l2reg':l2reg}
+#    parameters.append (run)
+#
+#epochs = 100
+
+
 
 # Batch size sensitivity
 # Smaller dataset for batchsize testing due to test time.
@@ -226,7 +232,7 @@ for run in parameters:
         predictions_test = oModel.predict(X_test, verbose=1) 
         np.savetxt (pred_test_name, predictions_test)
 
-        # known good output
+        # Write known good output for comparisons
         print("Writting known outputs")
         train_name = resultsDir + "/known_train+" + basefilename + ".csv"
         np.savetxt (train_name, Y_train)

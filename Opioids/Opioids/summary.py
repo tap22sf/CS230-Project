@@ -36,3 +36,6 @@ with open(resultsDir+'\\summary.csv', 'w', newline='') as summaryfile:
                 metric[1][0],
                 metric[1][1],
                 metric[1][2]])
+
+
+# Generate a combined history file with appropriate labels
