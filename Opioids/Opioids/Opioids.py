@@ -55,9 +55,11 @@ beta_1 = 0.90
 beta_2 = 0.999
 lr = -3.0
 epochs = 100
-dropout = 0.0
+dropout = 0.5
 l2reg = 0.0
 bz = 8192
+run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout, 'l2reg':l2reg}
+parameters.append (run)
 
 
 # Architecture evalaluation
@@ -68,22 +70,22 @@ bz = 8192
 #        parameters.append (run)
 
 # Best arch
-n = 500
-l = 3
-epochs = 100
+#n = 500
+#l = 3
+#epochs = 100
 
 ## Learning rate senstivity tests
 #for lr in (-2, -3, -4, -5, -6, -7):
 #    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout, 'l2reg':l2reg}
 #    parameters.append (run)
 
-lr = -3
+#lr = -3
 
 # Dropout evalaluation
-for d in range(0,6):
-    dropout = d/10
-    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout, 'l2reg':l2reg}
-    parameters.append (run)
+#for d in range(0,6):
+#    dropout = d/10
+#    run = {'epochs':epochs,'batch':bz,'lr' :lr,'layers':l,'nodes':n, 'dropout':dropout, 'l2reg':l2reg}
+#    parameters.append (run)
 
 
 # L2 Regularization search
