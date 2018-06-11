@@ -41,8 +41,8 @@ Run Opioids.py having loadPrevModel = True
 
 ## Results: 
 
-Preliminary graph of logistic regssion and RF results:  
-![](https://github.com/tap22sf/CS230-Project/blob/master/Images/AUC%20comparison.png)  
+The following graph shows the AUC results for the optimal model which was trained using the information of 126,763 patients:  
+![](https://github.com/tap22sf/CS230-Project/blob/master/Images/Results.jpg)  
 
 ## Citations
 (1) Mark TL, Vandivort-Warren R, Miller K: Mental health spending by private insurance: implications for the mental health parity and addiction equity act. Psychiatr Serv 63:313–318, 2012.  
