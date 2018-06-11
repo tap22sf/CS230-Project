@@ -2,17 +2,15 @@
 
 Given the addictive properties of opioid medications, they are not recommended after the immediate recovery period following surgery. However, approximately 20\% of patients undergoing lumbar fusion meet criteria for “chronic opioid use” more than 3 months after surgery [1]. Despite growing awareness about the opioid epidemic sweeping the US, we do not have currently any way to predict which patients will continue taking opioids for prolonged periods of time following surgery. In this project, we attempted to predict which patients were at risk for continued opioid usage after 3 months following lumbar fusion using administrative healthcare data. After conversion of diagnosis codes into their corresponding 300-dimensional encodings, an alternative training dataset was also created using principal components analysis (PCA) to reduce the dimensionality of these encodings into their most informative two dimensions. Ultimately, our model was able to achieve similar predictive accuracy on these two datasets, with AUCs of 0.725 and 0.728 for the raw encodings and dimensionality-reduced datasets, respective. This network performed as well or better than logistic regression (AUC = 0.721) and random forest (AUC = 0.724) classifiers trained on the same dataset. 
 
-## Helpful Links for getting started
-
-[Tensorflow Installation](https://www.tensorflow.org/install/)
-
 ## Background
 Despite increasing publicity of the current opioid epidemic, opioids are currently the most commonly prescribed medication for low back pain [1]. Although surgery can be an option for patients with particularly severe structural disease, we  currently do not have any way to predict which patients will continue opioid usage following surgery and which will be able to stop. With the increasing popularity of deep learning and the availability of larger databases in the past few years, this sort of prediction has become increasingly feasible. If we can better predict who is most likely to continue opioid usage following lumbar fusion, we can better divert counselling to these patients and help them stop taking opioid medications, decreasing their risk for addiction and overdose.  
 
 ## Database
-This project utilizes data from inpatient, outpatient, and pharmacy settings from the MarketScan Commercial Claims and Encounters Database and Medicare Supplemental and Coordination of Benefits Database. These data encompass health care claims submitted on behalf of individuals enrolled in private insurance plans and Medicare through a participating employer, health plan, or government organization. Both inpatient and outpatient data (including information on diagnosis, date of service, demographics, and employer information, among others) were queried to select our cohort of patients undergoing lumbar fusion. To obtain information on prescription drug use, we used the associated drug prescription database, which includes information on all prescriptions covered by insurance that were filled by the patient, along with dosage, drug identification number, day supply, and prescription date. The data are a common source of data for analyses of health care utilization and spending [2, 3, 4, 5].
+This project utilizes data from inpatient, outpatient, and pharmacy settings from the MarketScan Commercial Claims and Encounters Database and Medicare Supplemental and Coordination of Benefits Database. These data encompass health care claims submitted on behalf of individuals enrolled in private insurance plans and Medicare through a participating employer, health plan, or government organization. Both inpatient and outpatient data (including information on diagnosis, date of service, demographics, and employer information, among others) were queried to select our cohort of patients undergoing lumbar fusion. To obtain information on prescription drug use, we used the associated drug prescription database, which includes information on all prescriptions covered by insurance that were filled by the patient, along with dosage, drug identification number, day supply, and prescription date. 
 
-As the database is not available for public use, we created a sample dataset (Folder Sample Dataset) consisting of 10,000 patients. The features for each patient were generated such that the distribution of that feature is the same as the original dataset.
+The database we used consisted 140,848 patients enrolled in employer-provided health insurance plans. These patients underwent lumbar fusion between 2007 and 2013, and were enrolled in their health insurance plan for at least 6 months prior to surgery and at least 1 year following surgery to ensure adequate follow-up.   
+
+As the original dataset is not available for public use, we created a sample dataset (Folder Sample Dataset) consisting of 10,000 patients. The features for each patient were generated such that the distribution of that feature is the same as the original dataset.
 
 ## Running
 
@@ -46,9 +44,6 @@ The following graph shows the AUC results for the optimal model which was traine
 
 ## Citations
 (1) Mark TL, Vandivort-Warren R, Miller K: Mental health spending by private insurance: implications for the mental health parity and addiction equity act. Psychiatr Serv 63:313–318, 2012.  
-(2) Stephens JR, Steiner MJ, DeJong N, Rodean J, Hall M, Richardson T, et al: Healthcare utilization and spending for constipation in children with versus without complex chronic conditions. J Pediatr Gastroenterol Nutr 64:31–36, 2017.  
-(3) Veeravagu A, Cole TS, Jiang B, Ratliff JK, Gidwani RA: The use of bone morphogenetic protein in thoracolumbar spine procedures: analysis of the MarketScan longitudinal database. Spine J 14:2929–2937, 2014.  
-(4) Wu J, Thammakhoune J, Dai W, Koren A, Tcherny-Lessenot S, Wu C, et al: Assessment of dronedarone utilization using US claims databases. Clin Ther 36:264–272, 272.e1–272.e2, 2014.  
 
 # License
 MIT License
@@ -78,6 +73,3 @@ SOFTWARE.
 [encodings of medical information](http://people.csail.mit.edu/dsontag/papers/ChoiChiuSontag_AMIA_CRI16.pdf)  (will be used for ICD-9 code processing)  
 [link to download encodings of ICD-9 codes](https://github.com/clinicalml/embeddings/blob/master/claims_codes_hs_300.txt.gz)  
 [link to CDC MME conversion table](https://www.cdc.gov/drugoverdose/resources/data.html)  
-[l-bfgs]: https://en.wikipedia.org/wiki/Limited-memory_BFGS  
-[adam]: http://arxiv.org/abs/1412.6980  
-[license]: LICENSE.txt
