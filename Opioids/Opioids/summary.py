@@ -6,7 +6,7 @@ import numpy as np
 # Read the results directory
 #
 resultsDir = r'Results\BatchSize'
-resultsDir = r'Results\Model Arch Search'
+# resultsDir = r'Results\Model Arch Search'
 resultsDir = r'.'
 
 # Open a summary file
@@ -19,7 +19,7 @@ with open(resultsDir+'\\summary.csv', 'w', newline='') as summaryfile:
         fields = os.path.splitext(file)[0].split('+')
         if fields[0] == "metrics":
             metric = np.loadtxt(resultsDir+'\\'+file, delimiter=',', skiprows=1)
-            print (file)
+            print(file)
 
             writer.writerow ([
                 fields[2],

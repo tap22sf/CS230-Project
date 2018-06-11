@@ -26,6 +26,9 @@ def mean_pred(y_true, y_pred):
 ###################################################################################################
 # Parameters
 
+sampleDataset = True # Use fake dataset
+loadPrevModel = True
+
 training_portion = .95
 test_portion = 0.05
 
@@ -117,10 +120,16 @@ parameters.append (run)
 # Read from folder "Medical Database" which is at the same level as the project folder
 absFilePath = os.path.abspath(__file__)
 fileDir = os.path.dirname(absFilePath)
-parentDir = os.path.dirname(os.path.dirname(os.path.dirname(fileDir)))
-dataFile1Path = os.path.join(parentDir, 'Medical Database\\scaled_PCs')
-#dataFile1Path = os.path.join(parentDir, 'Medical Database\\withEncodings')
-dataFile2Path = os.path.join(parentDir, 'Medical Database\\data_y')
+
+if sampleDataset:
+    parentDir = os.path.dirname(os.path.dirname(fileDir))
+    dataFile1Path = os.path.join(parentDir, 'Sample Dataset/fake_scaled_PCs')
+    dataFile2Path = os.path.join(parentDir, 'Sample Dataset/fake_data_y')
+else:
+    parentDir = os.path.dirname(os.path.dirname(os.path.dirname(fileDir)))
+    dataFile1Path = os.path.join(parentDir, 'Medical Database\\scaled_PCs')
+    #dataFile1Path = os.path.join(parentDir, 'Medical Database\\withEncodings')
+    dataFile2Path = os.path.join(parentDir, 'Medical Database\\data_y')
 
 # Read the datasets
 X, Y = loadData(xFilename=dataFile1Path, yFilename=dataFile2Path)
@@ -152,8 +161,8 @@ for run in parameters:
     #K.set_session(sess)
         
     # Extract and adjust run variables                    
-    epochs = run ['epochs']
-    batch = run ['batch']
+    epochs = run['epochs']
+    batch = run['batch']
     lr = run['lr']
     lr = np.power(float(10), np.array(lr))
     layers = run['layers']
@@ -184,23 +193,29 @@ for run in parameters:
     #filepath = "Weights/Weights+lr" + str(lr) + "+dr" + str(dr) + "+bz" + str(batch) + "+n" + str(nodes) + "+l" + str(layers) +".hdf5"
     #checkpoint = ModelCheckpoint(filepath, monitor='binary_accuracy', verbose=1, save_best_only=True, mode='max')
     #callbacks_list = [checkpoint]
-        
+
+    basefilename = "e+" + str(epochs) + "+lr+" + str(lr) + "+dr+" + str(dr) + "+l2+" + str(l2reg) + "+bz+" + str(
+        batch) + "+n+" + str(nodes) + "+l+" + str(layers)
+    weightfile = weightDir + "/weights+" + basefilename + ".hdf5"
+
     # Fit the model
     #history = oModel.fit(X_trainDev, Y_trainDev, epochs=epochs, shuffle=False, batch_size=batch, callbacks=callbacks_list, validation_split=validation_split)
-    history = oModel.fit(X_trainDev, Y_trainDev, epochs=epochs, shuffle=False, batch_size=batch, validation_split=validation_split)
+    if loadPrevModel:
+        oModel.load_weights(weightfile, by_name=True)
+    else:
+        history = oModel.fit(X_trainDev, Y_trainDev, epochs=epochs, shuffle=False, batch_size=batch, validation_split=validation_split)
 
-    # Save relevant data to csv files
-    basefilename = "e+" + str(epochs) + "+lr+" + str(lr) + "+dr+" + str(dr) + "+l2+" + str(l2reg) + "+bz+" + str(batch)  + "+n+" + str(nodes) + "+l+" + str(layers)
-    csvFileName = resultsDir + "/history+" + basefilename + ".csv"
-    mergedData = np.column_stack((
-            np.array(history.history["loss"]),
-            np.array(history.history["val_loss"]),
-            np.array(history.history['binary_accuracy']),
-            np.array(history.history['val_binary_accuracy'])))
+        # Save relevant data to csv files
+        csvFileName = resultsDir + "/history+" + basefilename + ".csv"
+        mergedData = np.column_stack((
+                np.array(history.history["loss"]),
+                np.array(history.history["val_loss"]),
+                np.array(history.history['binary_accuracy']),
+                np.array(history.history['val_binary_accuracy'])))
 
-    np.savetxt(csvFileName, mergedData, delimiter=",", header="loss, val_loss, binary_accuracy, val_binary_accuracy", comments="")
-    weightfile = weightDir + "/weights+" + basefilename + ".hdf5"
-    oModel.save(weightfile)
+        np.savetxt(csvFileName, mergedData, delimiter=",", header="loss, val_loss, binary_accuracy, val_binary_accuracy", comments="")
+
+        oModel.save(weightfile)
     
     doMetrics = True
 
@@ -215,32 +230,32 @@ for run in parameters:
                 
         metric_file = resultsDir + "/metrics+" + basefilename + ".csv"
         format = []
-        format.append ("%5.3f")
-        format.append ("%5.3f")
-        format.append ("%5.3f")
-        np.savetxt (metric_file, mergedMetrics, delimiter=",", header= "train, dev, test", fmt=format)
+        format.append("%5.3f")
+        format.append("%5.3f")
+        format.append("%5.3f")
+        np.savetxt(metric_file, mergedMetrics, delimiter=",", header= "train, dev, test", fmt=format)
 
         # Save predictions
         print("Prediction Calculations")
         pred_train_name = resultsDir + "/pred_train+" + basefilename + ".csv"
         predictions_train = oModel.predict(X_train, verbose=1) 
-        np.savetxt (pred_train_name, predictions_train)
+        np.savetxt(pred_train_name, predictions_train)
 
         pred_dev_name = resultsDir + "/pred_dev+" + basefilename + ".csv"
         predictions_dev = oModel.predict(X_dev, verbose=1) 
-        np.savetxt (pred_dev_name, predictions_dev)
+        np.savetxt(pred_dev_name, predictions_dev)
 
         pred_test_name = resultsDir + "/pred_test+" + basefilename + ".csv"
         predictions_test = oModel.predict(X_test, verbose=1) 
-        np.savetxt (pred_test_name, predictions_test)
+        np.savetxt(pred_test_name, predictions_test)
 
         # Write known good output for comparisons
         print("Writting known outputs")
         train_name = resultsDir + "/known_train+" + basefilename + ".csv"
-        np.savetxt (train_name, Y_train)
+        np.savetxt(train_name, Y_train)
         dev_name = resultsDir + "/known_dev+" + basefilename + ".csv"
-        np.savetxt (dev_name, Y_dev)
+        np.savetxt(dev_name, Y_dev)
         test_name = resultsDir + "/known_test+" + basefilename + ".csv"
-        np.savetxt (test_name, Y_test)
+        np.savetxt(test_name, Y_test)
 
 
