@@ -25,18 +25,18 @@ The weights of the optimal model have been included in the folder "Weights". The
 + l2reg = 0.0 (L2 regularization)
 + bz = 8192 (batch size)
 
-To create virtual environment:
-`virtualenv -p python3 .env`
-`source .env/bin/activate`
+To create virtual environment:  
+`virtualenv -p python3 .env`  
+`source .env/bin/activate`  
 `pip install -r CS230-Project/requirements.txt`
 
-To generate predictiviness metrics for a given model:
+To generate predictiviness metrics for a given model:  
 Run Opioids.py
 
-If the model need to be trained:
+If the model need to be trained:  
 Run Opioids.py having loadPrevModel = False
 
-If the model weights are loaded from a previous training:
+If the model weights are loaded from a previous training:  
 Run Opioids.py having loadPrevModel = True
 
 ## Results: 
