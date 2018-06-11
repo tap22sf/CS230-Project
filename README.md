@@ -69,7 +69,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ## Resources
-[paper](http://arxiv.org/pdf/1508.06576v2.pdf)  
 [encodings of medical information](http://people.csail.mit.edu/dsontag/papers/ChoiChiuSontag_AMIA_CRI16.pdf)  (will be used for ICD-9 code processing)  
 [link to download encodings of ICD-9 codes](https://github.com/clinicalml/embeddings/blob/master/claims_codes_hs_300.txt.gz)  
 [link to CDC MME conversion table](https://www.cdc.gov/drugoverdose/resources/data.html)  
