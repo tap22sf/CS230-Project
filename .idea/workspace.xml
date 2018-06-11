@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3154454b-c680-46a8-a8dd-f6e245664687" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Opioids/Opioids/Opioids.py" beforeDir="false" afterPath="$PROJECT_DIR$/Opioids/Opioids/Opioids.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Opioids/Opioids/dataAnalysis.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Opioids/Opioids/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Opioids/Opioids/resultsAnalysis.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Opioids/Opioids/summary.py" beforeDir="false" afterPath="$PROJECT_DIR$/Opioids/Opioids/summary.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Opioids_FK.sublime-project" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Weights/weights+e+100+lr+0.001+dr+0.5+l2+0.0+bz+8192+n+500+l+3.hdf5" beforeDir="false" />
-    </list>
+    <list default="true" id="3154454b-c680-46a8-a8dd-f6e245664687" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -23,8 +14,8 @@
       <file leaf-file-name="Opioids.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Opioids/Opioids/Opioids.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
-              <caret line="38" selection-start-line="38" selection-end-line="38" selection-end-column="22" />
+            <state relative-caret-position="136">
+              <caret line="25" column="28" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -448,8 +439,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Opioids/Opioids/Opioids.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="38" selection-start-line="38" selection-end-line="38" selection-end-column="22" />
+        <state relative-caret-position="136">
+          <caret line="25" column="28" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
         </state>
       </provider>
     </entry>
